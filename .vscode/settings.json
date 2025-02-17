@@ -1,3 +1,7 @@
 {
+<<<<<<< HEAD
     "cmake.sourceDirectory": "/Users/mitchellsylvia/TrackGuideOnboard/blink"
+=======
+    "cmake.sourceDirectory": "/Users/mitchellsylvia/TrackGuideOnboard/RTK_Connect"
+>>>>>>> main
 }
