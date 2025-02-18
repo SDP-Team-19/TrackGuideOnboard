@@ -48,3 +48,4 @@ _deps
 CMakeUserPresets.json
 vcpkg-manifest-install.log
 CMakeCache.txt
+./build/*

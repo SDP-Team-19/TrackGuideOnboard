@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
-project(HelloWorld)
+project(TrackGuideOnboard)
 
-find_package(fmt CONFIG REQUIRED)
+add_executable(main src/main.cpp)
+add_library(macors src/MaCORS/MaCORS.cpp)
 
-add_executable(HelloWorld helloworld.cpp)
+find_package(CURL REQUIRED)
+target_include_directories(macors PRIVATE ${CURL_INCLUDE_DIRS})
+target_link_libraries(macors PRIVATE ${CURL_LIBRARIES})
 
-target_link_libraries(HelloWorld PRIVATE fmt::fmt)
+target_link_libraries(main PRIVATE macors)

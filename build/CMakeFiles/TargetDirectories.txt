@@ -1,3 +1,0 @@
-/Users/mitchellsylvia/TrackGuideOnboard/build/CMakeFiles/HelloWorld.dir
-/Users/mitchellsylvia/TrackGuideOnboard/build/CMakeFiles/edit_cache.dir
-/Users/mitchellsylvia/TrackGuideOnboard/build/CMakeFiles/rebuild_cache.dir
