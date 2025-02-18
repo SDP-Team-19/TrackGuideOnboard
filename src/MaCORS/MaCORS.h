@@ -6,10 +6,10 @@
 #include <string>
 #include <curl/curl.h>
 
-class HttpRequest {
+class MaCORS {
 public:
-    HttpRequest(const std::string& user, const std::string& password, const std::string& area);
-    HttpRequest(const std::string& user, const std::string& password);
+    MaCORS(const std::string& user, const std::string& password, const std::string& area);
+    MaCORS(const std::string& user, const std::string& password);
     bool sendRequest();
 
 private:

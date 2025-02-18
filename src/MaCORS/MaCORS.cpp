@@ -1,12 +1,12 @@
 #include "MaCORS.h"
 
-HttpRequest::HttpRequest(const std::string& user, const std::string& password, const std::string& area)
+MaCORS::MaCORS(const std::string& user, const std::string& password, const std::string& area)
     : user_(user), password_(password), area_(area) {}
 
-HttpRequest::HttpRequest(const std::string& user, const std::string& password)
+MaCORS::MaCORS(const std::string& user, const std::string& password)
     : user_(user), password_(password), area_("") {}
 
-bool HttpRequest::sendRequest() {
+bool MaCORS::sendRequest() {
     CURL* curl;
     CURLcode res;
     std::string url = "http://macorsrtk.massdot.state.ma.us:10000/" + area_;
