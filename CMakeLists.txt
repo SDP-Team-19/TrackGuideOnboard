@@ -12,6 +12,9 @@ find_library(RTKLIB_LIB rtklib PATHS ${RTKLIB_LIBRARY_DIR})
 # Include RTKLIB headers
 include_directories(${RTKLIB_INCLUDE_DIR})
 
+# Include directory for tcpserver.h
+include_directories(${CMAKE_SOURCE_DIR}/src/rtkservice)
+
 # Create executable for main
 add_executable(main src/main.cpp)
 
