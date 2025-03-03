@@ -34,7 +34,7 @@ int RTKService::shutdown_server() const {
         return 1;
     }
 
-    const char *shutdown_cmd = "shutdown\r\n";
+    const char *shutdown_cmd = "shutdown\n";
     if (send(sockfd, shutdown_cmd, strlen(shutdown_cmd), 0) == -1) {
         perror("Attempt to issue the shutdown command failed");
         close(sockfd);
