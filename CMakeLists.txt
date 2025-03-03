@@ -16,16 +16,12 @@ include_directories(${RTKLIB_INCLUDE_DIR})
 add_executable(main src/main.cpp)
 
 # Create macors library
-add_library(macors src/MaCORS/MaCORS.cpp)
+add_library(rtkservice src/rtkservice/rtkservice.cpp)
+add_library(tcpserver src/rtkservice/tcpserver.cpp)
 
 # Find CURL package
 find_package(CURL REQUIRED)
 
-# Include CURL headers for macors
-target_include_directories(macors PRIVATE ${CURL_INCLUDE_DIRS})
-
-# Link libraries to macors
-target_link_libraries(macors PRIVATE ${RTKLIB_LIB} ${CURL_LIBRARIES})
-
 # Link macors library to the main executable
-target_link_libraries(main PRIVATE macors ${RTKLIB_LIB} ${CURL_LIBRARIES})
+target_link_libraries(main PRIVATE rtkservice ${RTKLIB_LIB} ${CURL_LIBRARIES})
+target_link_libraries(main PRIVATE tcpserver ${RTKLIB_LIB} ${CURL_LIBRARIES})
