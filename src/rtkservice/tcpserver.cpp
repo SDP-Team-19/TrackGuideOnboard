@@ -1,9 +1,27 @@
 #include "tcpserver.h"
+#include <signal.h>
+#include <sys/wait.h>
 
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
 
+void handle_sigchld(int sig) {
+    // Wait for all dead processes.
+    // We use a loop to make sure we reap all children that have terminated.
+    while (waitpid(-1, NULL, WNOHANG) > 0);
+}
+
 TCPServer::TCPServer(int port) : port(port) {
+    // Set up the signal handler for SIGCHLD
+    struct sigaction sa;
+    sa.sa_handler = handle_sigchld;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        std::cerr << "sigaction() failed: " << strerror(errno) << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     // Create a socket
     server_socket = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket == -1) {
@@ -122,4 +140,3 @@ void TCPServer::run_function() {
     // Implement the function you want to run in a new process
     std::cout << "Running function in a new process." << std::endl;
 }
-
