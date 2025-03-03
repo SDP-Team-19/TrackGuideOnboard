@@ -9,6 +9,7 @@ RTKService* rtk_service_ptr = nullptr;
 
 void signal_handler(int signal) {
     if (signal == SIGINT && rtk_service_ptr) {
+        std::cout << "Shutting down RTK service..." << std::endl;
         if (rtk_service_ptr->shutdown_server() == 1) {
             std::cerr << "Failed to shut down RTK service.  Please check if the server is running. Try to shut it down gracefully with `telnet localhost 12346` and type `shutdown` (If that does not work, `ps aux | grep [r]tkrcv`, and kill the process)" << std::endl;
         }
