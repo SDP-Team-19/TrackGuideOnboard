@@ -49,3 +49,6 @@ CMakeUserPresets.json
 vcpkg-manifest-install.log
 CMakeCache.txt
 ./build/*
+
+# Log Files
+logs/*
