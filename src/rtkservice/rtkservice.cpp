@@ -34,12 +34,22 @@ int RTKService::shutdown_server() const {
         return 1;
     }
 
-    const char *shutdown_cmd = "shutdown\n";
+    const char *shutdown_cmd = "shutdown\r\n";
     if (send(sockfd, shutdown_cmd, strlen(shutdown_cmd), 0) == -1) {
         perror("Attempt to issue the shutdown command failed");
         close(sockfd);
         return 1;
     }
+
+    char buffer[1024] = {0};
+    int valread = read(sockfd, buffer, 1024);
+    if (valread == -1) {
+        perror("Failed to read response from server");
+        close(sockfd);
+        return 1;
+    }
+
+    std::cout << "Server response: " << buffer << std::endl;
     std::cout << "RTK server has been shutdown gracefully" << std::endl;
     close(sockfd);
     return 0;
