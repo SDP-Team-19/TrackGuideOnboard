@@ -9,6 +9,7 @@ class RTKService {
 public:
     RTKService(const std::string& config_file);
     void start_server() const;
+    int shutdown_server() const;
 
 private:
     std::string config_file_;
