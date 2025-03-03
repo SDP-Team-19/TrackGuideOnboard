@@ -1,8 +1,4 @@
 #include "rtkservice.h"
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #define PORT 12346
 
 RTKService::RTKService(const std::string& config_file) : config_file_(config_file) {}

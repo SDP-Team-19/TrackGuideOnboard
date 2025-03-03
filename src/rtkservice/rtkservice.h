@@ -2,8 +2,13 @@
 #define RTKSERVICE_H
 
 #include <string>
+#include <cstring>
 #include <iostream>
 #include <cstdlib>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 class RTKService {
 public:
