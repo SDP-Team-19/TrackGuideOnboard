@@ -1,6 +1,7 @@
 #include "tcpserver.h"
 #include <signal.h>
 #include <sys/wait.h>
+#include <sstream>
 
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
@@ -125,7 +126,7 @@ void TCPServer::handle_client(int client_socket) {
         send(client_socket, buffer, bytes_received, 0);
 
         // Run the function in a new process
-        run_function();
+        run_function(buffer);
     }
 
     if (bytes_received == -1) {
@@ -136,7 +137,18 @@ void TCPServer::handle_client(int client_socket) {
     std::cout << "Client disconnected." << std::endl;
 }
 
-void TCPServer::run_function() {
+void TCPServer::run_function(const char* content) {
     // Implement the function you want to run in a new process
     std::cout << "Running function in a new process." << std::endl;
+
+    // Example content received
+    // Extract the latitude and longitude values
+    std::istringstream iss(content);
+    std::string date, time;
+    double latitude, longitude;
+
+    iss >> date >> time >> latitude >> longitude;
+
+    // Print the extracted values
+    std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << std::endl;
 }

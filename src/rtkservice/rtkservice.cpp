@@ -12,6 +12,7 @@ void RTKService::start_server() const {
 }
 
 int RTKService::shutdown_server() const {
+    // Not the best solution, but it works for now
     std::string command = "pkill -f rtkrcv";
     std::system(command.c_str());
     std::exit(0);

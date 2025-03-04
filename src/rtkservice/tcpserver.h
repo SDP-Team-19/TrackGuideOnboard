@@ -20,7 +20,7 @@ private:
     struct sockaddr_in server_addr;
 
     void handle_client(int client_socket);
-    void run_function();
+    void run_function(const char* content);
 };
 
 #endif // TCP_SERVER_H
