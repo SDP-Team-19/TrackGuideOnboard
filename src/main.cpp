@@ -8,10 +8,6 @@ RTKService* rtk_service_ptr = nullptr;
 #include <iostream>
 
 void signal_handler(int signal) {
-    static bool already_shutting_down = false;
-    if (already_shutting_down) return;
-    already_shutting_down = true;
-
     if (signal == SIGINT && rtk_service_ptr) {
         std::cout << "Shutting down RTK service..." << std::endl;
         if (rtk_service_ptr->shutdown_server() == 1) {
