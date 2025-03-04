@@ -3,6 +3,7 @@
 #include <sys/wait.h>
 #include <sstream>
 #include <fstream>
+#include <mutex>
 
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
