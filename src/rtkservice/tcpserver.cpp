@@ -2,6 +2,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sstream>
+#include <fstream>
 
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
@@ -149,6 +150,22 @@ void TCPServer::run_function(const char* content) {
 
     iss >> date >> time >> latitude >> longitude;
 
-    // Print the extracted values
-    std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << std::endl;
+    // Use a mutex to avoid race conditions when writing to the file
+    static std::mutex file_mutex;
+    std::lock_guard<std::mutex> lock(file_mutex);
+
+    // Open the CSV file in append mode
+    std::ofstream outfile("coordinates.csv", std::ios_base::app);
+    if (!outfile.is_open()) {
+        std::cerr << "Failed to open coordinates.csv" << std::endl;
+        return;
+    }
+
+    // Write the latitude and longitude to the CSV file
+    outfile << latitude << ", " << longitude << std::endl;
+
+    // Close the file
+    outfile.close();
+
+    std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << " saved to coordinates.csv" << std::endl;
 }
