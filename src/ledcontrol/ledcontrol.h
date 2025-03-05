@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <iostream>
+#include <unistd.h>
 extern "C" {
     #include <ws2811.h>
 }
@@ -23,6 +24,7 @@ public:
     void indicate_right(Color color);
     void indicate_both(Color color);
     void indicate_all(Color color);
+    void indicate_startup_message();
     void clear();
 
 private:

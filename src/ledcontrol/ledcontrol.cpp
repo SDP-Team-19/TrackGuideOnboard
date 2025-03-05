@@ -75,6 +75,17 @@ void LEDControl::indicate_all(Color color) {
     ws2811_render(&_ledstring);
 }
 
+void LEDControl::indicate_startup_message() {
+    std::cout << "Indicating startup message" << std::endl;
+
+    for (int i = 0; i < 3; ++i) {
+        indicate_all(Color::BLUE);
+        usleep(250000);
+        indicate_all(Color::OFF);
+        usleep(250000);
+    }
+}
+
 void LEDControl::clear() {
     std::cout << "Clearing the LED strip" << std::endl;
 
