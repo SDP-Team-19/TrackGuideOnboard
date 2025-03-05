@@ -6,8 +6,9 @@ project(TrackGuideOnboard)
 set(RTKLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(RTKLIB_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libs)
 
-# Find RTKLIB library
+# Find libraries
 find_library(RTKLIB_LIB rtklib PATHS ${RTKLIB_LIBRARY_DIR})
+find_library(WS2811_LIBRARY ws2811 REQUIRED)
 
 # Include RTKLIB headers
 include_directories(${RTKLIB_INCLUDE_DIR})
@@ -28,3 +29,5 @@ find_package(CURL REQUIRED)
 # Link macors library to the main executable
 target_link_libraries(main PRIVATE rtkservice ${RTKLIB_LIB} ${CURL_LIBRARIES})
 target_link_libraries(main PRIVATE tcpserver ${RTKLIB_LIB} ${CURL_LIBRARIES})
+target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
+target_include_directories(main PRIVATE /usr/local/include)
