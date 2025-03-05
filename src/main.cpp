@@ -41,11 +41,11 @@ int main() {
     int resetButtonPin = 20; // GPIO20
     int playButtonPin = 21; // GPIO21
     gpioSetMode(recordButtonPin, PI_INPUT);
-    gpioSetPullUpDown(recordButtonPin, PI_PUD_DOWN);
+    gpioSetPullUpDown(recordButtonPin, PI_PUD_UP);
     gpioSetMode(resetButtonPin, PI_INPUT);
-    gpioSetPullUpDown(resetButtonPin, PI_PUD_DOWN);
+    gpioSetPullUpDown(resetButtonPin, PI_PUD_UP);
     gpioSetMode(playButtonPin, PI_INPUT);
-    gpioSetPullUpDown(playButtonPin, PI_PUD_DOWN);
+    gpioSetPullUpDown(playButtonPin, PI_PUD_UP);
 
     while (true) {
         int recordButtonState = gpioRead(recordButtonPin);
@@ -56,15 +56,11 @@ int main() {
         int resetButtonState = gpioRead(resetButtonPin);
         if (resetButtonState == PI_HIGH) {
             std::cout << "Reset Button Pressed" << std::endl;
-        } else {
-            std::cout << "Reset Button Released" << std::endl;
         }
 
         int playButtonState = gpioRead(playButtonPin);
         if (playButtonState == PI_HIGH) {
             std::cout << "Play Button Pressed" << std::endl;
-        } else {
-            std::cout << "Play Button Released" << std::endl;
         }
 
         sleep(1); // Delay for 1 second
