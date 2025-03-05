@@ -92,9 +92,9 @@ void TCPServer::start() {
             std::cout << "Startup message received from server" << std::endl;
             for (int i = 0; i < 3; ++i) {
                 _led_controller.indicate_all(Color::BLUE);
-                usleep(500000);
+                usleep(250000);
                 _led_controller.indicate_all(Color::OFF);
-                usleep(500000);
+                usleep(250000);
             }
             close(client_socket);
         } else {
