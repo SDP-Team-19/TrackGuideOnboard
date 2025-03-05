@@ -49,17 +49,17 @@ int main() {
 
     while (true) {
         int recordButtonState = gpioRead(recordButtonPin);
-        if (recordButtonState == PI_HIGH) {
+        if (recordButtonState == PI_LOW) {
             std::cout << "Record Button Pressed" << std::endl;
         }
 
         int resetButtonState = gpioRead(resetButtonPin);
-        if (resetButtonState == PI_HIGH) {
+        if (resetButtonState == PI_LOW) {
             std::cout << "Reset Button Pressed" << std::endl;
         }
 
         int playButtonState = gpioRead(playButtonPin);
-        if (playButtonState == PI_HIGH) {
+        if (playButtonState == PI_LOW) {
             std::cout << "Play Button Pressed" << std::endl;
         }
 
