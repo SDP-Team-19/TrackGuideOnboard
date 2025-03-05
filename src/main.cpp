@@ -24,6 +24,7 @@ int main() {
     LEDControl led_control(12, 30);
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
+    usleep(3000000);
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
     rtk_service_ptr = &rtk_service;
     std::signal(SIGINT, signal_handler);

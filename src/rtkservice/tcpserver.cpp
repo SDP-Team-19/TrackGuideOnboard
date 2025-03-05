@@ -90,7 +90,12 @@ void TCPServer::start() {
         if (initial_byte == '%') {
             // Handle the client in the same process
             std::cout << "Startup message received from server" << std::endl;
-            _led_controller.indicate_all(Color::BLUE);
+            for (int i = 0; i < 3; ++i) {
+                _led_controller.indicate_all(Color::BLUE);
+                usleep(500000);
+                _led_controller.indicate_all(Color::OFF);
+                usleep(500000);
+            }
             close(client_socket);
         } else {
             // Fork a new process to handle the client
