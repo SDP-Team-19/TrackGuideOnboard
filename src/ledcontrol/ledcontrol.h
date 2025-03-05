@@ -19,9 +19,10 @@ enum class Color {
 class LEDControl {
 public:
     LEDControl(uint8_t gpioPin, uint16_t stripLength);
-
     void indicate_left(Color color);
     void indicate_right(Color color);
+    void indicate_both(Color color);
+    void indicate_all(Color color);
     void clear();
 
 private:

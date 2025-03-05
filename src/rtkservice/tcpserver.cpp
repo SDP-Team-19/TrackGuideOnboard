@@ -1,9 +1,4 @@
 #include "tcpserver.h"
-#include <signal.h>
-#include <sys/wait.h>
-#include <sstream>
-#include <fstream>
-#include <mutex>
 
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
@@ -14,7 +9,7 @@ void handle_sigchld(int sig) {
     while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 
-TCPServer::TCPServer(int port) : port(port) {
+TCPServer::TCPServer(int port, LEDControl led_controller) : _led_controller(led_controller) {
     // Set up the signal handler for SIGCHLD
     struct sigaction sa;
     sa.sa_handler = handle_sigchld;
@@ -26,45 +21,46 @@ TCPServer::TCPServer(int port) : port(port) {
     }
 
     // Create a socket
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_socket == -1) {
+    _server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (_server_socket == -1) {
         std::cerr << "Socket creation failed: " << strerror(errno) << std::endl;
         exit(EXIT_FAILURE);
     }
 
     // Set socket options
     int opt = 1;
-    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+    if (setsockopt(_server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         std::cerr << "setsockopt() failed: " << strerror(errno) << std::endl;
-        close(server_socket);
+        close(_server_socket);
         exit(EXIT_FAILURE);
     }
 
     // Configure server address
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-    server_addr.sin_addr.s_addr = INADDR_ANY;
-    memset(&(server_addr.sin_zero), '\0', 8);
+    _server_addr.sin_family = AF_INET;
+    _server_addr.sin_port = htons(port);
+    _server_addr.sin_addr.s_addr = INADDR_ANY;
+    memset(&(_server_addr.sin_zero), '\0', 8);
 
     // Bind the socket
-    if (bind(server_socket, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1) {
+    if (bind(_server_socket, (struct sockaddr *)&_server_addr, sizeof(struct sockaddr)) == -1) {
         std::cerr << "Bind failed: " << strerror(errno) << std::endl;
-        close(server_socket);
+        close(_server_socket);
         exit(EXIT_FAILURE);
     }
 
     // Listen for incoming connections
-    if (listen(server_socket, BACKLOG) == -1) {
+    if (listen(_server_socket, BACKLOG) == -1) {
         std::cerr << "Listen failed: " << strerror(errno) << std::endl;
-        close(server_socket);
+        close(_server_socket);
         exit(EXIT_FAILURE);
     }
 
     std::cout << "Server listening on port " << port << std::endl;
 }
 
+
 TCPServer::~TCPServer() {
-    close(server_socket);
+    close(_server_socket);
 }
 
 void TCPServer::start() {
@@ -74,7 +70,7 @@ void TCPServer::start() {
 
     // Main loop to accept and handle client connections
     while (true) {
-        client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &sin_size);
+        client_socket = accept(_server_socket, (struct sockaddr *)&client_addr, &sin_size);
         if (client_socket == -1) {
             std::cerr << "Accept failed: " << strerror(errno) << std::endl;
             continue;
@@ -94,6 +90,7 @@ void TCPServer::start() {
         if (initial_byte == '%') {
             // Handle the client in the same process
             std::cout << "Startup message received from server" << std::endl;
+            _led_controller.indicate_all(Color::BLUE);
             close(client_socket);
         } else {
             // Fork a new process to handle the client
@@ -104,7 +101,7 @@ void TCPServer::start() {
                 continue;
             } else if (pid == 0) {
                 // Child process
-                close(server_socket); // Close the listening socket in the child process
+                close(_server_socket); // Close the listening socket in the child process
                 handle_client(client_socket);
                 exit(EXIT_SUCCESS);
             } else {

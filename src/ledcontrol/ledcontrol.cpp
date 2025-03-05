@@ -55,6 +55,26 @@ void LEDControl::indicate_right(Color color) {
     ws2811_render(&_ledstring);
 }
 
+void LEDControl::indicate_both(Color color) {
+    std::cout << "Indicating both with color " << static_cast<int>(color) << std::endl;
+
+    ws2811_led_t led_color = map_color(color);
+    indicate_left(color);
+    indicate_right(color);
+    ws2811_render(&_ledstring);
+}
+
+void LEDControl::indicate_all(Color color) {
+    std::cout << "Indicating all with color " << static_cast<int>(color) << std::endl;
+
+    ws2811_led_t led_color = map_color(color);
+    for (int i = 0; i < _stripLength; ++i) {
+        _ledstring.channel[0].leds[i] = led_color;
+    }
+
+    ws2811_render(&_ledstring);
+}
+
 void LEDControl::clear() {
     std::cout << "Clearing the LED strip" << std::endl;
 

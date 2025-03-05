@@ -23,14 +23,13 @@ void signal_handler(int signal) {
 int main() {
     LEDControl led_control(12, 30);
     led_control_ptr = &led_control;
-    led_control.indicate_left(Color::BLUE);
-    led_control.indicate_right(Color::BLUE);
+    led_control.indicate_all(Color::GREEN);
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
     rtk_service_ptr = &rtk_service;
     std::signal(SIGINT, signal_handler);
 
     rtk_service.start_server();
-    TCPServer server(PORT);
+    TCPServer server(PORT, led_control);
     server.start();
     return EXIT_SUCCESS;
 }
