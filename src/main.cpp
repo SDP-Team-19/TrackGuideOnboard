@@ -1,6 +1,7 @@
 #include <csignal>
 #include "tcpserver.h"
 #include "rtkservice.h"
+#include "ledcontrol.h"
 #define PORT 12345
 
 RTKService* rtk_service_ptr = nullptr;
@@ -18,6 +19,9 @@ void signal_handler(int signal) {
 }
 
 int main() {
+    LEDControl led_control(12, 30);
+    led_control.indicate_left(Color::BLUE);
+    led_control.indicate_right(Color::BLUE);
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
     rtk_service_ptr = &rtk_service;
     std::signal(SIGINT, signal_handler);
