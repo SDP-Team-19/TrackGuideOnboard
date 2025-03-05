@@ -4,23 +4,32 @@
 #include <vector>
 #include <tuple>
 #include <string>
+#include <fstream>
+#include <sstream>
+#include <cmath>
+#include <stdexcept>
+#include <vector>
+#include <nanoflann.hpp>
 
-class RecordBoundaryLogic {
+class BoundaryLogic {
 private:
-    float max_distance;
-    std::vector<std::tuple<float, float>> recorded_path;
+    double _threshold;
+    std::vector<std::tuple<double, double>> recorded_path;
+    std::unique_ptr<KDTree> _kdtree_ptr;
+    std::unique_ptr<PointCloud> _point_cloud_ptr;
+    double computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next);
 
 public:
     // Constructor that initializes max_distance
-    RecordBoundaryLogic(float max_distance);
+    BoundaryLogic(double threshold);
 
     // Default constructor
-    RecordBoundaryLogic();
+    BoundaryLogic();
 
     /*  Function to calculate distance given latitude and longitude, 
         using KD-tree and calculating the distance perpendicular to the heading
     */
-    float calculate_distance(float latitude, float longitude);
+    double calculate_distance(double latitude, double longitude);
 
     // Function to load track from a saved CSV file
     void load_track(const std::string& file_path);
