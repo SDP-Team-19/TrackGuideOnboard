@@ -14,15 +14,15 @@ LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength)
             [0] = {
                 .gpionum = gpioPin,
                 .count = stripLength,
-                .invert = 0,
-                .brightness = 255,
                 .strip_type = WS2812_STRIP,
+                .brightness = 255,
+                .invert = 0,
             },
             [1] = {
                 .gpionum = 0,
                 .count = 0,
-                .invert = 0,
                 .brightness = 0,
+                .invert = 0,
             },
         },
     };
@@ -73,5 +73,6 @@ ws2811_led_t LEDControl::map_color(Color color) {
         case Color::YELLOW: return 0x00202000;
         case Color::WHITE:  return 0x00202020;
         case Color::OFF:    return 0x00000000;
+        default:            return 0x00000000;
     }
 }
