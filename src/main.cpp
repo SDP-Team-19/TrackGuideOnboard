@@ -30,6 +30,8 @@ void signal_handler(int signal) {
 }
 
 int main() {
+
+    std::signal(SIGINT, signal_handler);
     if (gpioInitialise() < 0) {
         std::cerr << "pigpio initialization failed." << std::endl;
         return 1;
