@@ -2,7 +2,7 @@
 #include "tcpserver.h"
 #include "rtkservice.h"
 #include "ledcontrol.h"
-#include <pgipio.h>
+#include <pgipio>
 #define PORT 12345
 
 RTKService* rtk_service_ptr = nullptr;
