@@ -60,6 +60,8 @@ void Buttons::monitor_button() {
             
         }
         prevRecordButtonState_ = recordState;
+        prevResetButtonState_ = resetState;
+        prevPlayButtonState_ = playState;
 
         // Add a small delay to prevent high CPU usage
         gpioDelay(10000); // 10 milliseconds
