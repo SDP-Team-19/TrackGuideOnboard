@@ -40,9 +40,11 @@ int main() {
 
     if (shutdown_requested.load()) {
         if (rtk_service_ptr) {
+            std::cout << "Shutting down rtk service" << std::endl;
             rtk_service_ptr->shutdown_server();
         }
         if (led_control_ptr) {
+            std::cout << "Shutting down led control" << std::endl;
             led_control_ptr->clear();
         }
     }
