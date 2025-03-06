@@ -64,13 +64,13 @@ TCPServer::~TCPServer() {
     close(serverSocket_);
 }
 
-void TCPServer::start() {
+void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     struct sockaddr_in client_addr;
     socklen_t sin_size = sizeof(struct sockaddr_in);
     int client_socket;
 
     // Main loop to accept and handle client connections
-    while (true) {
+    while (!shutdown_requested.load(std::memory_order_relaxed)) {
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
         if (client_socket == -1) {
             std::cerr << "Accept failed: " << strerror(errno) << std::endl;

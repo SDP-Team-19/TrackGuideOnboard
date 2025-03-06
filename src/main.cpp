@@ -12,28 +12,14 @@ RTKService* rtk_service_ptr = nullptr;
 LEDControl* led_control_ptr = nullptr;
 
 std::atomic<SystemState> system_state(SystemState::STANDBY);
+std::atomic<bool> shutdown_requested(false);  // Atomic flag
 
 std::thread button_thread;
 
-
 void signal_handler(int signal) {
     if (signal == SIGINT) {
-        std::cout << "Shutting down RTK service..." << std::endl;
-        if (rtk_service_ptr)
-        {
-            if (rtk_service_ptr->shutdown_server() == 1) {
-                std::cerr << "Failed to shut down RTK service.  Please check if the server is running. Try to shut it down gracefully with `telnet localhost 12346` and type `shutdown` (If that does not work, `ps aux | grep [r]tkrcv`, and kill the process)" << std::endl;
-            }
-        }
-        if (led_control_ptr) {
-            led_control_ptr->clear();
-        }
-        if (button_thread.joinable()) {
-            button_thread.join();
-        }
-        gpioTerminate();
+        shutdown_requested.store(true, std::memory_order_relaxed);
     }
-    exit(EXIT_SUCCESS);
 }
 
 int main() {
@@ -54,6 +40,22 @@ int main() {
     std::thread button_thread(&Buttons::monitor_button, &buttons);
     button_thread.detach();
     TCPServer server(PORT, led_control, system_state);
-    server.start();
+    server.start(shutdown_requested);
+
+    std::cout << "Shutting down safely..." << std::endl;
+
+    if (rtk_service_ptr)
+    {
+        rtk_service_ptr->shutdown_server();
+    }
+    if (led_control_ptr) {
+        led_control_ptr->clear();
+    }
+    if (button_thread.joinable()) {
+        button_thread.join();
+    }
+
+    exit(EXIT_SUCCESS);
+
     return EXIT_SUCCESS;
 }

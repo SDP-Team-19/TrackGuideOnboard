@@ -20,7 +20,7 @@ class TCPServer {
 public:
     TCPServer(int port, LEDControl ledController, std::atomic<SystemState>& systemState);
     ~TCPServer();
-    void start();
+    void start(std::atomic<bool>& shutdown_requested);
 
 private:
     int serverSocket_;
