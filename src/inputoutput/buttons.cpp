@@ -29,15 +29,17 @@ void Buttons::monitor_button() {
         recordState = get_button_state(recordPin_);
         resetState = get_button_state(resetPin_);
         playState = get_button_state(playPin_);
+        SystemState currentSystemState = systemState_.load(std::memory_order_relaxed);
 
         if (recordState == ButtonState::PRESSED && prevRecordButtonState_ == ButtonState::RELEASED) {
             // Record button pressed
-            systemState_.store(SystemState::RECORDING, std::memory_order_relaxed);
-            std::cout << "Record button pressed" << std::endl;
-        } else if (recordState == ButtonState::RELEASED && prevRecordButtonState_ == ButtonState::PRESSED) {
-            // Record button released
-            systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
-            std::cout << "Record button released" << std::endl;
+            if (currentSystemState == SystemState::RECORDING) {
+                systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
+                std::cout << "Record button pressed" << std::endl;
+            } else {
+                systemState_.store(SystemState::RECORDING, std::memory_order_relaxed);
+                std::cout << "Record button pressed" << std::endl;
+            }
         }
 
         if (resetState == ButtonState::PRESSED && prevResetButtonState_ == ButtonState::RELEASED) {
@@ -48,12 +50,14 @@ void Buttons::monitor_button() {
 
         if (playState == ButtonState::PRESSED && prevPlayButtonState_ == ButtonState::RELEASED) {
             // Play button pressed
-            systemState_.store(SystemState::PLAYING, std::memory_order_relaxed);
-            std::cout << "Play button pressed" << std::endl;
-        } else if (playState == ButtonState::RELEASED && prevPlayButtonState_ == ButtonState::PRESSED) {
-            // Play button released
-            systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
-            std::cout << "Play button released" << std::endl;
+            if (currentSystemState == SystemState::PLAYING) {
+                systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
+                std::cout << "Play button pressed" << std::endl;
+            } else {
+                systemState_.store(SystemState::PLAYING, std::memory_order_relaxed);
+                std::cout << "Play button pressed" << std::endl;
+            }
+            
         }
         prevRecordButtonState_ = recordState;
 
