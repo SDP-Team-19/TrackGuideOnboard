@@ -72,6 +72,11 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_relaxed)) {
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
+
+        if (shutdown_requested.load(std::memory_order_relaxed)) {
+            break; // Exit loop if shutdown is requested
+        }
+
         if (client_socket == -1) {
             std::cerr << "Accept failed: " << strerror(errno) << std::endl;
             continue;
@@ -111,6 +116,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
             }
         }
     }
+    std::cout << "Server shutting down..." << std::endl;
 }
 
 void TCPServer::handle_client(int client_socket) {

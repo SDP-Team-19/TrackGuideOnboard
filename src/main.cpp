@@ -30,15 +30,14 @@ int main() {
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
     rtk_service_ptr = &rtk_service;
     rtk_service.start_server();
-    // Buttons buttons(16, 20, 21);
-    // std::thread button_thread(&Buttons::monitor_button, &buttons);
-    // button_thread.detach();
-    // TCPServer server(PORT, led_control, system_state);
-    // server.start(shutdown_requested);
+    Buttons buttons(16, 20, 21);
+    std::thread button_thread(&Buttons::monitor_button, &buttons);
+    button_thread.detach();
+    TCPServer server(PORT, led_control, system_state);
+    server.start(shutdown_requested);
 
     std::cout << "Shutting down safely..." << std::endl;
 
-    //if (shutdown_requested.load()) {
     if (rtk_service_ptr) {
         std::cout << "Shutting down rtk service" << std::endl;
         rtk_service_ptr->shutdown_server();
@@ -47,10 +46,9 @@ int main() {
         std::cout << "Shutting down led control" << std::endl;
         led_control_ptr->clear();
     }
-    //}
-    // if (button_thread.joinable()) {
-    //     button_thread.join();
-    // }
+    if (button_thread.joinable()) {
+        button_thread.join();
+    }
 
     gpioTerminate();
 
