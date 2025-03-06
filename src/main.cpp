@@ -42,12 +42,13 @@ int main() {
 
     std::cout << "Shutting down safely..." << std::endl;
 
-    if (rtk_service_ptr)
-    {
-        rtk_service_ptr->shutdown_server();
-    }
-    if (led_control_ptr) {
-        led_control_ptr->clear();
+    if (shutdown_requested.load()) {
+        if (rtk_service_ptr) {
+            rtk_service_ptr->shutdown_server();
+        }
+        if (led_control_ptr) {
+            led_control_ptr->clear();
+        }
     }
     if (button_thread.joinable()) {
         button_thread.join();
