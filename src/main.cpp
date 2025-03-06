@@ -16,17 +16,12 @@ std::atomic<bool> shutdown_requested(false);  // Atomic flag
 
 void signal_handler(int signal) {
     if (signal == SIGINT) {
-        std::cout << "SIGINT received." << std::endl;
+        shutdown_requested.store(true, std::memory_order_relaxed);
     }
 }
 
 int main() {
     std::signal(SIGINT, signal_handler);
-    if (gpioInitialise() < 0) {
-        std::cerr << "pigpio initialization failed." << std::endl;
-        return 1;
-    }
-
     LEDControl led_control(12, 30);
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
@@ -54,7 +49,7 @@ int main() {
         button_thread.join();
     }
 
-    gpioTerminate();
+    // gpioTerminate();
 
     return EXIT_SUCCESS;
 }
