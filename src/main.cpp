@@ -14,8 +14,6 @@ LEDControl* led_control_ptr = nullptr;
 std::atomic<SystemState> system_state(SystemState::STANDBY);
 std::atomic<bool> shutdown_requested(false);  // Atomic flag
 
-std::thread button_thread;
-
 void signal_handler(int signal) {
     if (signal == SIGINT) {
         shutdown_requested.store(true, std::memory_order_relaxed);
@@ -55,7 +53,7 @@ int main() {
         button_thread.join();
     }
 
-    exit(EXIT_SUCCESS);
+    gpioTerminate();
 
     return EXIT_SUCCESS;
 }
