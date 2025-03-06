@@ -55,6 +55,7 @@ void Buttons::monitor_button() {
             systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
             std::cout << "Play button released" << std::endl;
         }
+        prevRecordButtonState_ = recordState;
 
         // Add a small delay to prevent high CPU usage
         gpioDelay(10000); // 10 milliseconds
