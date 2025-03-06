@@ -25,9 +25,6 @@ void signal_handler(int signal) {
         if (led_control_ptr) {
             led_control_ptr->clear();
         }
-        if (button_thread.joinable()) {
-            button_thread.join();
-        }
         gpioTerminate();
     }
     exit(EXIT_SUCCESS);
