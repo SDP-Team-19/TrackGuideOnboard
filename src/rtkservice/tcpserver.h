@@ -13,6 +13,7 @@
 #include <fstream>
 #include <mutex>
 #include "ledcontrol.h"
+#include <atomic>
 
 class TCPServer {
 public:
