@@ -1,4 +1,5 @@
 #include "tcpserver.h"
+#include "buttons.h"
 
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
@@ -9,7 +10,7 @@ void handle_sigchld(int sig) {
     while (waitpid(-1, NULL, WNOHANG) > 0);
 }
 
-TCPServer::TCPServer(int port, LEDControl led_controller) : _led_controller(led_controller) {
+TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemState>& systemState) : ledController_(led_controller), systemState_(systemState) {
     // Set up the signal handler for SIGCHLD
     struct sigaction sa;
     sa.sa_handler = handle_sigchld;
@@ -21,37 +22,37 @@ TCPServer::TCPServer(int port, LEDControl led_controller) : _led_controller(led_
     }
 
     // Create a socket
-    _server_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (_server_socket == -1) {
+    serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocket_ == -1) {
         std::cerr << "Socket creation failed: " << strerror(errno) << std::endl;
         exit(EXIT_FAILURE);
     }
 
     // Set socket options
     int opt = 1;
-    if (setsockopt(_server_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+    if (setsockopt(serverSocket_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         std::cerr << "setsockopt() failed: " << strerror(errno) << std::endl;
-        close(_server_socket);
+        close(serverSocket_);
         exit(EXIT_FAILURE);
     }
 
     // Configure server address
-    _server_addr.sin_family = AF_INET;
-    _server_addr.sin_port = htons(port);
-    _server_addr.sin_addr.s_addr = INADDR_ANY;
-    memset(&(_server_addr.sin_zero), '\0', 8);
+    serverAddr_.sin_family = AF_INET;
+    serverAddr_.sin_port = htons(port);
+    serverAddr_.sin_addr.s_addr = INADDR_ANY;
+    memset(&(serverAddr_.sin_zero), '\0', 8);
 
     // Bind the socket
-    if (bind(_server_socket, (struct sockaddr *)&_server_addr, sizeof(struct sockaddr)) == -1) {
+    if (bind(serverSocket_, (struct sockaddr *)&serverAddr_, sizeof(struct sockaddr)) == -1) {
         std::cerr << "Bind failed: " << strerror(errno) << std::endl;
-        close(_server_socket);
+        close(serverSocket_);
         exit(EXIT_FAILURE);
     }
 
     // Listen for incoming connections
-    if (listen(_server_socket, BACKLOG) == -1) {
+    if (listen(serverSocket_, BACKLOG) == -1) {
         std::cerr << "Listen failed: " << strerror(errno) << std::endl;
-        close(_server_socket);
+        close(serverSocket_);
         exit(EXIT_FAILURE);
     }
 
@@ -60,7 +61,7 @@ TCPServer::TCPServer(int port, LEDControl led_controller) : _led_controller(led_
 
 
 TCPServer::~TCPServer() {
-    close(_server_socket);
+    close(serverSocket_);
 }
 
 void TCPServer::start() {
@@ -70,7 +71,7 @@ void TCPServer::start() {
 
     // Main loop to accept and handle client connections
     while (true) {
-        client_socket = accept(_server_socket, (struct sockaddr *)&client_addr, &sin_size);
+        client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
         if (client_socket == -1) {
             std::cerr << "Accept failed: " << strerror(errno) << std::endl;
             continue;
@@ -90,7 +91,7 @@ void TCPServer::start() {
         if (initial_byte == '%') {
             // Handle the client in the same process
             std::cout << "Startup message received from server" << std::endl;
-            _led_controller.indicate_startup_message();
+            ledController_.indicate_startup_message();
             close(client_socket);
         } else {
             // Fork a new process to handle the client
@@ -101,7 +102,7 @@ void TCPServer::start() {
                 continue;
             } else if (pid == 0) {
                 // Child process
-                close(_server_socket); // Close the listening socket in the child process
+                close(serverSocket_); // Close the listening socket in the child process
                 handle_client(client_socket);
                 exit(EXIT_SUCCESS);
             } else {
@@ -115,6 +116,7 @@ void TCPServer::start() {
 void TCPServer::handle_client(int client_socket) {
     char buffer[BUFFER_SIZE];
     ssize_t bytes_received;
+    SystemState currentState = systemState_.load(std::memory_order_relaxed);
 
     // Communicate with the client
     while ((bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0)) > 0) {
@@ -125,7 +127,18 @@ void TCPServer::handle_client(int client_socket) {
         send(client_socket, buffer, bytes_received, 0);
 
         // Run the function in a new process
-        run_function(buffer);
+        if (currentState == SystemState::RECORDING) {
+            run_record_function(buffer);
+        }else if (currentState == SystemState::PLAYING)
+        {
+            /* code */
+        }else if (currentState == SystemState::RESETTING)
+        {
+
+            systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
+        }
+        
+        
     }
 
     if (bytes_received == -1) {
@@ -136,9 +149,9 @@ void TCPServer::handle_client(int client_socket) {
     std::cout << "Client disconnected." << std::endl;
 }
 
-void TCPServer::run_function(const char* content) {
+void TCPServer::run_record_function(const char* content) {
     // Implement the function you want to run in a new process
-    std::cout << "Running function in a new process." << std::endl;
+    std::cout << "Running record function in a new process." << std::endl;
 
     // Example content received
     // Extract the latitude and longitude values
@@ -166,4 +179,14 @@ void TCPServer::run_function(const char* content) {
     outfile.close();
 
     std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << " saved to coordinates.csv" << std::endl;
+}
+
+void TCPServer::run_play_function(const char* content) {
+    // Implement the function you want to run in a new process
+    std::cout << "Running play function in a new process." << std::endl;
+}
+
+void TCPServer::run_reset_function() {
+    // Implement the function you want to run in a new process
+    std::cout << "Running reset function in a new process." << std::endl;
 }

@@ -16,17 +16,20 @@
 
 class TCPServer {
 public:
-    TCPServer(int port, LEDControl led_controller);
+    TCPServer(int port, LEDControl ledController, std::atomic<SystemState>& systemState);
     ~TCPServer();
     void start();
 
 private:
-    int _server_socket;
-    LEDControl _led_controller;
-    struct sockaddr_in _server_addr;
+    int serverSocket_;
+    LEDControl ledController_;
+    std::atomic<SystemState>& systemState_;
+    struct sockaddr_in serverAddr_;
 
-    void handle_client(int client_socket);
-    void run_function(const char* content);
+    void handle_client(int clientSocket);
+    void run_record_function(const char* content);
+    void run_play_function(const char* content);
+    void run_reset_function();
 };
 
 #endif // TCP_SERVER_H
