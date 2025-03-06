@@ -16,7 +16,7 @@ std::atomic<bool> shutdown_requested(false);  // Atomic flag
 
 void signal_handler(int signal) {
     if (signal == SIGINT) {
-        shutdown_requested.store(true, std::memory_order_relaxed);
+        std::cout << "SIGINT received." << std::endl;
     }
 }
 
