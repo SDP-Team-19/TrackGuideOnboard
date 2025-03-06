@@ -22,8 +22,12 @@ void signal_handler(int signal) {
         if (rtk_service_ptr->shutdown_server() == 1) {
             std::cerr << "Failed to shut down RTK service.  Please check if the server is running. Try to shut it down gracefully with `telnet localhost 12346` and type `shutdown` (If that does not work, `ps aux | grep [r]tkrcv`, and kill the process)" << std::endl;
         }
-        led_control_ptr->clear();
-        button_thread.join();
+        if (led_control_ptr) {
+            led_control_ptr->clear();
+        }
+        if (button_thread.joinable()) {
+            button_thread.join();
+        }
         gpioTerminate();
     }
     exit(EXIT_SUCCESS);
