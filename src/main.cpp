@@ -34,7 +34,7 @@ int main() {
     rtk_service_ptr = &rtk_service;
     rtk_service.start_server();
     Buttons buttons(16, 20, 21);
-    std::thread button_thread(&Buttons::monitor_button, &buttons, shutdown_requested);
+    std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
     TCPServer server(PORT, led_control, system_state);
     server.start(shutdown_requested);
 
