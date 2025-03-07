@@ -26,7 +26,7 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
     ButtonState recordState = ButtonState::RELEASED;
     ButtonState resetState = ButtonState::RELEASED;
     ButtonState playState = ButtonState::RELEASED;
-    while (!shutdown_requested.load(std::memory_order_relaxed)) {
+    while (!shutdown_requested.load(std::memory_order_acquire)) {
         recordState = get_button_state(recordPin_);
         resetState = get_button_state(resetPin_);
         playState = get_button_state(playPin_);

@@ -55,13 +55,14 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     int client_socket;
 
     // Main loop to accept and handle client connections
-    while (!shutdown_requested.load(std::memory_order_relaxed)) {
+    while (!shutdown_requested.load(std::memory_order_acquire)) {
 
         fd_set read_fds;
         FD_ZERO(&read_fds);
         FD_SET(serverSocket_, &read_fds);
 
         struct timeval timeout = {1, 0};  // 1 second timeout
+        std::cout << "Waiting for activity..." << std::endl;
         int activity = select(serverSocket_ + 1, &read_fds, NULL, NULL, &timeout);
         if (activity == -1) {
             if (errno == EINTR) continue; // Retry if interrupted by signal
@@ -79,7 +80,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
             continue;
         }
 
-        if (shutdown_requested.load(std::memory_order_relaxed)) {
+        if (shutdown_requested.load(std::memory_order_acquire)) {
             close(client_socket);
             return; // Exit loop if shutdown is requested
         }
