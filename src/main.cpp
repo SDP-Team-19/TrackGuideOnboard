@@ -17,9 +17,7 @@ std::atomic<bool> shutdown_requested(false);  // Atomic flag
 void signal_handler(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
         shutdown_requested.store(true, std::memory_order_release);
-        std::cout << "Interrupt received. Shutting down..." << std::endl;
     } else if (signal == SIGCHLD) {
-        std::cout << "Reaping child" << std::endl;
         // Prevent zombie processes
         while (waitpid(-1, NULL, WNOHANG) > 0);
     }
@@ -54,10 +52,12 @@ int main() {
     if (rtk_service_ptr) {
         std::cout << "Shutting down rtk service" << std::endl;
         rtk_service_ptr->shutdown_server();
+        rtk_service_ptr = nullptr;
     }
     if (led_control_ptr) {
         std::cout << "Shutting down led control" << std::endl;
         led_control_ptr->clear();
+        led_control_ptr = nullptr;
     }
     if (button_thread.joinable()) {
         button_thread.join();
