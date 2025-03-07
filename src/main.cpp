@@ -28,6 +28,8 @@ int main() {
     std::signal(SIGTERM, signal_handler);
     std::signal(SIGCHLD, signal_handler);
 
+    gpioCfgSetInternals(1 << 10);
+
     LEDControl led_control(12, 30);
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
