@@ -26,7 +26,6 @@ void signal_handler(int signal) {
 int main() {
     std::signal(SIGINT, signal_handler);
     std::signal(SIGCHLD, signal_handler);
-    gpioInitialise();
     LEDControl led_control(12, 30);
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
