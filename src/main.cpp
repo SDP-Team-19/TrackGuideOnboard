@@ -17,11 +17,15 @@ std::atomic<bool> shutdown_requested(false);  // Atomic flag
 void signal_handler(int signal) {
     if (signal == SIGINT) {
         shutdown_requested.store(true, std::memory_order_relaxed);
+    }else if (signal == SIGCHLD) {
+        // Prevent zombie processes
+        while (waitpid(-1, NULL, WNOHANG) > 0);
     }
 }
 
 int main() {
     std::signal(SIGINT, signal_handler);
+    std::signal(SIGCHLD, signal_handler);
     gpioInitialise();
     LEDControl led_control(12, 30);
     led_control_ptr = &led_control;
@@ -32,7 +36,6 @@ int main() {
     rtk_service.start_server();
     Buttons buttons(16, 20, 21);
     std::thread button_thread(&Buttons::monitor_button, &buttons);
-    button_thread.detach();
     TCPServer server(PORT, led_control, system_state);
     server.start(shutdown_requested);
 

@@ -4,23 +4,8 @@
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
 
-void handle_sigchld(int sig) {
-    // Wait for all dead processes.
-    // We use a loop to make sure we reap all children that have terminated.
-    while (waitpid(-1, NULL, WNOHANG) > 0);
-}
 
 TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemState>& systemState) : ledController_(led_controller), systemState_(systemState) {
-    // Set up the signal handler for SIGCHLD
-    struct sigaction sa;
-    sa.sa_handler = handle_sigchld;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESTART;
-    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        std::cerr << "sigaction() failed: " << strerror(errno) << std::endl;
-        exit(EXIT_FAILURE);
-    }
-
     // Create a socket
     serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket_ == -1) {
@@ -71,15 +56,30 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_relaxed)) {
+
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
+        FD_SET(serverSocket_, &read_fds);
+        struct timeval timeout = {1, 0};  // 1 second timeout
+        int activity = select(serverSocket_ + 1, &read_fds, NULL, NULL, &timeout);
+        if (activity == -1 && errno != EINTR) {
+            std::cerr << "select() failed: " << strerror(errno) << std::endl;
+            break;
+        }
+        if (activity == 0) continue;  // Timeout expired, check shutdown_requested
+
+
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
 
-        if (shutdown_requested.load(std::memory_order_relaxed)) {
-            break; // Exit loop if shutdown is requested
-        }
-
         if (client_socket == -1) {
+            if (errno == EINTR) break; // Allow shutdown
             std::cerr << "Accept failed: " << strerror(errno) << std::endl;
             continue;
+        }
+
+        if (shutdown_requested.load(std::memory_order_relaxed)) {
+            close(client_socket);
+            break; // Exit loop if shutdown is requested
         }
 
         std::cout << "Connection received from " << inet_ntoa(client_addr.sin_addr) << std::endl;
@@ -117,6 +117,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         }
     }
     std::cout << "Server shutting down..." << std::endl;
+    close(serverSocket_);
 }
 
 void TCPServer::handle_client(int client_socket) {
