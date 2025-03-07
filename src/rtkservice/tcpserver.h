@@ -18,13 +18,13 @@
 
 class TCPServer {
 public:
-    TCPServer(int port, LEDControl& ledController, std::atomic<SystemState>& systemState);
+    TCPServer(int port, LEDControl ledController, std::atomic<SystemState>& systemState);
     ~TCPServer();
     void start(std::atomic<bool>& shutdown_requested);
 
 private:
     int serverSocket_;
-    LEDControl& ledController_;
+    LEDControl ledController_;
     std::atomic<SystemState>& systemState_;
     struct sockaddr_in serverAddr_;
 

@@ -42,7 +42,7 @@ int main() {
     Buttons buttons(16, 20, 21);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
-    TCPServer server(PORT, *led_control_ptr, system_state);
+    TCPServer server(PORT, led_control_ptr, system_state);
     server.start(shutdown_requested);
 
     while(!shutdown_requested.load(std::memory_order_acquire)) {
