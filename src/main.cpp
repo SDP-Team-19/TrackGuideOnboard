@@ -54,10 +54,10 @@ int main() {
         std::cout << "Shutting down led control" << std::endl;
         led_control_ptr->clear();
     }
-    gpioTerminate();
     if (button_thread.joinable()) {
         button_thread.join();
     }
+    gpioTerminate();
 
     return EXIT_SUCCESS;
 }
