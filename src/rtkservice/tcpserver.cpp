@@ -71,7 +71,6 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         }
         if (activity == 0) continue;  // Timeout expired, check shutdown_requested
 
-
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
 
         if (client_socket == -1) {
