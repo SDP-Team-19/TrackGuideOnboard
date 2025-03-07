@@ -19,7 +19,7 @@ enum class ButtonState {
 class Buttons {
 public:
     Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin);
-    void monitor_button();
+    void monitor_button(std::atomic<bool>& shutdown_requested);
 
 private:
     uint8_t recordPin_;

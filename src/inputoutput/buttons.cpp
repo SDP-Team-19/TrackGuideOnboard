@@ -21,11 +21,11 @@ Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin)
     gpioSetPullUpDown(playPin_, PI_PUD_UP);
 }
 
-void Buttons::monitor_button() {
+void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
     ButtonState recordState = ButtonState::RELEASED;
     ButtonState resetState = ButtonState::RELEASED;
     ButtonState playState = ButtonState::RELEASED;
-    while (true) {
+    while (!shutdown_requested.load(std::memory_order_relaxed)) {
         recordState = get_button_state(recordPin_);
         resetState = get_button_state(resetPin_);
         playState = get_button_state(playPin_);
@@ -66,6 +66,7 @@ void Buttons::monitor_button() {
         // Add a small delay to prevent high CPU usage
         gpioDelay(10000); // 10 milliseconds
     }
+    std::cout << "Button monitoring thread shutting down..." << std::endl;
 }
 
 ButtonState Buttons::get_button_state(uint8_t pin) {
