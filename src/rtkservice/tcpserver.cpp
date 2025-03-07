@@ -5,7 +5,7 @@
 #define BUFFER_SIZE 1024
 
 
-TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemState>& systemState) : ledController_(led_controller), systemState_(systemState) {
+TCPServer::TCPServer(int port, LEDControl& led_controller, std::atomic<SystemState>& systemState) : ledController_(led_controller), systemState_(systemState) {
     // Create a socket
     serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket_ == -1) {
