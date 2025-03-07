@@ -15,10 +15,11 @@ std::atomic<SystemState> system_state(SystemState::STANDBY);
 std::atomic<bool> shutdown_requested(false);  // Atomic flag
 
 void signal_handler(int signal) {
-    std::cout << "Interrupt received. Shutting down..." << std::endl;
     if (signal == SIGINT) {
         shutdown_requested.store(true, std::memory_order_relaxed);
+        std::cout << "Interrupt received. Shutting down..." << std::endl;
     }else if (signal == SIGCHLD) {
+        std::cout << "Reaping child" << std::endl;
         // Prevent zombie processes
         while (waitpid(-1, NULL, WNOHANG) > 0);
     }
