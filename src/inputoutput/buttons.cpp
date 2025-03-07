@@ -13,6 +13,7 @@ Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin)
         // Initialization failed
         throw std::runtime_error("pigpio initialization failed");
     }
+    std::cout << "pigpio initialized" << std::endl;
     gpioSetMode(recordPin_, PI_INPUT);
     gpioSetMode(resetPin_, PI_INPUT);
     gpioSetMode(playPin_, PI_INPUT);
