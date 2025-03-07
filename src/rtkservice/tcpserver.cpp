@@ -53,6 +53,8 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     struct sockaddr_in client_addr;
     socklen_t sin_size = sizeof(struct sockaddr_in);
     int client_socket;
+    
+    signal(SIGCHLD, [](int) { while (waitpid(-1, NULL, WNOHANG) > 0); });
 
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_relaxed)) {
@@ -60,11 +62,12 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         fd_set read_fds;
         FD_ZERO(&read_fds);
         FD_SET(serverSocket_, &read_fds);
+
         struct timeval timeout = {1, 0};  // 1 second timeout
         int activity = select(serverSocket_ + 1, &read_fds, NULL, NULL, &timeout);
-        if (activity == -1 && errno != EINTR) {
+        if (activity == -1) {
             std::cerr << "select() failed: " << strerror(errno) << std::endl;
-            break;
+            return;
         }
         if (activity == 0) continue;  // Timeout expired, check shutdown_requested
 

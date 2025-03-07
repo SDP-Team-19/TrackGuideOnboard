@@ -15,6 +15,7 @@ std::atomic<SystemState> system_state(SystemState::STANDBY);
 std::atomic<bool> shutdown_requested(false);  // Atomic flag
 
 void signal_handler(int signal) {
+    std::cout << "Interrupt received. Shutting down..." << std::endl;
     if (signal == SIGINT) {
         shutdown_requested.store(true, std::memory_order_relaxed);
     }else if (signal == SIGCHLD) {
@@ -26,15 +27,19 @@ void signal_handler(int signal) {
 int main() {
     std::signal(SIGINT, signal_handler);
     std::signal(SIGCHLD, signal_handler);
+
     LEDControl led_control(12, 30);
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
+
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
     rtk_service_ptr = &rtk_service;
     rtk_service.start_server();
+
     Buttons buttons(16, 20, 21);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
+
     TCPServer server(PORT, led_control, system_state);
     server.start(shutdown_requested);
 
