@@ -32,6 +32,7 @@ private:
     void run_record_function(const char* content);
     void run_play_function(const char* content);
     void run_reset_function();
+    void close_server();
 };
 
 #endif // TCP_SERVER_H

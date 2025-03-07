@@ -17,7 +17,7 @@ TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemStat
     int opt = 1;
     if (setsockopt(serverSocket_, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
         std::cerr << "setsockopt() failed: " << strerror(errno) << std::endl;
-        close(serverSocket_);
+        close_server();
         exit(EXIT_FAILURE);
     }
 
@@ -30,14 +30,14 @@ TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemStat
     // Bind the socket
     if (bind(serverSocket_, (struct sockaddr *)&serverAddr_, sizeof(struct sockaddr)) == -1) {
         std::cerr << "Bind failed: " << strerror(errno) << std::endl;
-        close(serverSocket_);
+        close_server();
         exit(EXIT_FAILURE);
     }
 
     // Listen for incoming connections
     if (listen(serverSocket_, BACKLOG) == -1) {
         std::cerr << "Listen failed: " << strerror(errno) << std::endl;
-        close(serverSocket_);
+        close_server();
         exit(EXIT_FAILURE);
     }
 
@@ -46,15 +46,13 @@ TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemStat
 
 
 TCPServer::~TCPServer() {
-    close(serverSocket_);
+    close_server();
 }
 
 void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     struct sockaddr_in client_addr;
     socklen_t sin_size = sizeof(struct sockaddr_in);
     int client_socket;
-    
-    signal(SIGCHLD, [](int) { while (waitpid(-1, NULL, WNOHANG) > 0); });
 
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_relaxed)) {
@@ -66,6 +64,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         struct timeval timeout = {1, 0};  // 1 second timeout
         int activity = select(serverSocket_ + 1, &read_fds, NULL, NULL, &timeout);
         if (activity == -1) {
+            if (errno == EINTR) continue; // Retry if interrupted by signal
             std::cerr << "select() failed: " << strerror(errno) << std::endl;
             return;
         }
@@ -75,14 +74,14 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
 
         if (client_socket == -1) {
-            if (errno == EINTR) break; // Allow shutdown
+            if (errno == EINTR) return; // Allow shutdown
             std::cerr << "Accept failed: " << strerror(errno) << std::endl;
             continue;
         }
 
         if (shutdown_requested.load(std::memory_order_relaxed)) {
             close(client_socket);
-            break; // Exit loop if shutdown is requested
+            return; // Exit loop if shutdown is requested
         }
 
         std::cout << "Connection received from " << inet_ntoa(client_addr.sin_addr) << std::endl;
@@ -110,7 +109,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
                 continue;
             } else if (pid == 0) {
                 // Child process
-                close(serverSocket_); // Close the listening socket in the child process
+                close_server(); // Close the listening socket in the child process
                 handle_client(client_socket);
                 exit(EXIT_SUCCESS);
             } else {
@@ -120,7 +119,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         }
     }
     std::cout << "Server shutting down..." << std::endl;
-    close(serverSocket_);
+    close_server();
 }
 
 void TCPServer::handle_client(int client_socket) {
@@ -199,4 +198,12 @@ void TCPServer::run_play_function(const char* content) {
 void TCPServer::run_reset_function() {
     // Implement the function you want to run in a new process
     std::cout << "Running reset function in a new process." << std::endl;
+}
+
+void TCPServer::close_server() {
+    if (serverSocket_ != -1) {
+        close(serverSocket_);
+    }
+    serverSocket_ = -1;
+    std::cout << "Server closed." << std::endl;
 }

@@ -49,16 +49,17 @@ int main() {
     if (rtk_service_ptr) {
         std::cout << "Shutting down rtk service" << std::endl;
         rtk_service_ptr->shutdown_server();
+        free(rtk_service_ptr);
     }
     if (led_control_ptr) {
         std::cout << "Shutting down led control" << std::endl;
         led_control_ptr->clear();
+        free(led_control_ptr);
     }
+    gpioTerminate();
     if (button_thread.joinable()) {
         button_thread.join();
     }
-
-    gpioTerminate();
 
     return EXIT_SUCCESS;
 }
