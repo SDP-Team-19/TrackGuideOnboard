@@ -27,6 +27,7 @@ void signal_handler(int signal) {
 
 int main() {
     std::signal(SIGINT, signal_handler);
+    std::signal(SIGTERM, signal_handler);
     std::signal(SIGCHLD, signal_handler);
 
     LEDControl led_control(12, 30);

@@ -56,7 +56,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_acquire)) {
-
+        std::cout << "Shutdown requested: " << shutdown_requested.load(std::memory_order_acquire) << std::endl;
         fd_set read_fds;
         FD_ZERO(&read_fds);
         FD_SET(serverSocket_, &read_fds);
