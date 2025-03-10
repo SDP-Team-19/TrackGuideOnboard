@@ -2,16 +2,36 @@
 #define BOUNDARYLOGIC_H
 
 #include <vector>
-#include <tuple>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <cmath>
-#include <stdexcept>
-#include <vector>
-#include <nanoflann.hpp>
 #include <memory>
 #include <mutex>
+#include <nanoflann.hpp>
+
+// Define a simple 2D point structure
+struct Point2D {
+    double x, y;
+};
+
+// Create a point cloud structure for nanoflann
+struct PointCloud {
+    std::vector<Point2D> points;
+
+    // Must provide a way to access the point data for nanoflann
+    inline size_t kdtree_get_point_count() const { return points.size(); }
+
+    inline double kdtree_get_pt(const size_t idx, int dim) const {
+        return (dim == 0) ? points[idx].x : points[idx].y;
+    }
+
+    // Optional bounding box (not needed for most cases)
+    template <class BBOX>
+    bool kdtree_get_bbox(BBOX&) const { return false; }
+};
+
+typedef nanoflann::KDTreeSingleIndexAdaptor<
+    nanoflann::L2_Simple_Adaptor<double, PointCloud>,
+    PointCloud, 
+    2  // 2D points
+> KDTree;
 
 class BoundaryLogic {
 public:

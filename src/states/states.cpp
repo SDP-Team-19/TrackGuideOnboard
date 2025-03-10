@@ -54,15 +54,9 @@ void States::run_play_function(const char* content) {
         track_loaded_ = true;
     }
 
-    // Create an instance of BoundaryLogic
-    BoundaryLogic boundaryLogic;
-
-    // Load the track from the CSV file
-    boundaryLogic.load_track("coordinates.csv");
-
     // Calculate the distance
     try {
-        double distance = boundaryLogic.calculate_distance(latitude, longitude);
+        double distance = boundaryLogic_.calculate_distance(latitude, longitude);
         std::cout << "Distance from track: " << distance << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;
