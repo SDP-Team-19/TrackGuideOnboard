@@ -38,7 +38,7 @@ void LEDControl::indicate_left(Color color) {
 
     ws2811_led_t led_color = map_color(color);
     for (int i = 0; i < 5; ++i) {
-        _ledstring.channel[0].leds[i] = led_color;
+        _ledstring.channel[1].leds[i] = led_color;
     }
 
     ws2811_render(&_ledstring);
@@ -49,7 +49,7 @@ void LEDControl::indicate_right(Color color) {
 
     ws2811_led_t led_color = map_color(color);
     for (int i = _stripLength - 5; i < _stripLength; ++i) {
-        _ledstring.channel[0].leds[i] = led_color;
+        _ledstring.channel[1].leds[i] = led_color;
     }
 
     ws2811_render(&_ledstring);
@@ -69,7 +69,7 @@ void LEDControl::indicate_all(Color color) {
 
     ws2811_led_t led_color = map_color(color);
     for (int i = 0; i < _stripLength; ++i) {
-        _ledstring.channel[0].leds[i] = led_color;
+        _ledstring.channel[1].leds[i] = led_color;
     }
 
     ws2811_render(&_ledstring);
@@ -90,7 +90,7 @@ void LEDControl::clear() {
     std::cout << "Clearing the LED strip" << std::endl;
 
     for (int i = 0; i < _stripLength; ++i) {
-        _ledstring.channel[0].leds[i] = 0x00000000;
+        _ledstring.channel[1].leds[i] = 0x00000000;
     }
 
     ws2811_render(&_ledstring);
