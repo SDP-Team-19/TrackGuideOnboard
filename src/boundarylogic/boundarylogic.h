@@ -10,29 +10,36 @@
 #include <stdexcept>
 #include <vector>
 #include <nanoflann.hpp>
+#include <memory>
+#include <mutex>
 
 class BoundaryLogic {
-private:
-    double _threshold;
-    std::vector<std::tuple<double, double>> recorded_path;
-    std::unique_ptr<KDTree> _kdtree_ptr;
-    std::unique_ptr<PointCloud> _point_cloud_ptr;
-    double computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next);
-
 public:
-    // Constructor that initializes max_distance
+    // Constructors
     BoundaryLogic(double threshold);
-
-    // Default constructor
     BoundaryLogic();
 
-    /*  Function to calculate distance given latitude and longitude, 
-        using KD-tree and calculating the distance perpendicular to the heading
-    */
-    double calculate_distance(double latitude, double longitude);
+    // Delete copy constructor and copy assignment operator
+    BoundaryLogic(const BoundaryLogic&) = delete;
+    BoundaryLogic& operator=(const BoundaryLogic&) = delete;
 
-    // Function to load track from a saved CSV file
+    // Default move constructor and move assignment operator
+    BoundaryLogic(BoundaryLogic&&) = default;
+    BoundaryLogic& operator=(BoundaryLogic&&) = default;
+
+    // Member functions
+    double calculate_distance(double latitude, double longitude);
     void load_track(const std::string& file_path);
+
+private:
+    double computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next);
+
+    double _threshold;
+    std::vector<Point2D> recorded_path;
+    std::unique_ptr<KDTree> _kdtree_ptr;
+    std::unique_ptr<PointCloud> _point_cloud_ptr;
+    std::mutex file_mutex;
+    std::mutex kdtree_mutex;  // Mutex to protect access to the KD-tree
 };
 
 #endif // BOUNDARYLOGIC_H

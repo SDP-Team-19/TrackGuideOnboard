@@ -158,48 +158,6 @@ void TCPServer::handle_client(int client_socket) {
     std::cout << "Client disconnected." << std::endl;
 }
 
-void TCPServer::run_record_function(const char* content) {
-    // Implement the function you want to run in a new process
-    std::cout << "Running record function in a new process." << std::endl;
-
-    // Example content received
-    // Extract the latitude and longitude values
-    std::istringstream iss(content);
-    std::string date, time;
-    double latitude, longitude;
-
-    iss >> date >> time >> latitude >> longitude;
-
-    // Use a mutex to avoid race conditions when writing to the file
-    static std::mutex file_mutex;
-    std::lock_guard<std::mutex> lock(file_mutex);
-
-    // Open the CSV file in append mode
-    std::ofstream outfile("coordinates.csv", std::ios_base::app);
-    if (!outfile.is_open()) {
-        std::cerr << "Failed to open coordinates.csv" << std::endl;
-        return;
-    }
-
-    // Write the latitude and longitude to the CSV file
-    outfile << latitude << ", " << longitude << std::endl;
-
-    // Close the file
-    outfile.close();
-
-    std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << " saved to coordinates.csv" << std::endl;
-}
-
-void TCPServer::run_play_function(const char* content) {
-    // Implement the function you want to run in a new process
-    std::cout << "Running play function in a new process." << std::endl;
-}
-
-void TCPServer::run_reset_function() {
-    // Implement the function you want to run in a new process
-    std::cout << "Running reset function in a new process." << std::endl;
-}
-
 void TCPServer::close_server() {
     if (serverSocket_ != -1) {
         close(serverSocket_);

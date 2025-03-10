@@ -39,6 +39,8 @@ BoundaryLogic::BoundaryLogic() : _threshold(0.0f) {}
 
 // Function to calculate distance given latitude and longitude
 double BoundaryLogic::calculate_distance(double latitude, double longitude) {
+    std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
+
     KNNResultSet<double> resultSet(1);
     Point2D userPos = {latitude, longitude};  // User's position
     double queryPt[2] = {userPos.x, userPos.y};
@@ -49,7 +51,6 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
         throw std::runtime_error("Recorded path is empty.");
     }
 
-    KNNResultSet<double> resultSet(1);
     resultSet.init(&nearestIdx, &outDistSqr);
     SearchParameters params;
     params.sorted = false;
@@ -65,6 +66,8 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
 
 // Function to load track from a saved CSV file
 void BoundaryLogic::load_track(const std::string& file_path) {
+    std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
+
     std::ifstream file(file_path);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + file_path);
@@ -79,7 +82,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
             double latitude = std::stof(lat_str);
             double longitude = std::stof(lon_str);
             recorded_path.emplace_back(latitude, longitude);
-            _point_cloud_ptr->points.push_back({latitude, longitude});
+            point_cloud.points.push_back({latitude, longitude});
         }
     }
     file.close();

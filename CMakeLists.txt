@@ -17,6 +17,8 @@ include_directories(${RTKLIB_INCLUDE_DIR})
 # Include directory for tcpserver.h
 include_directories(${CMAKE_SOURCE_DIR}/src/rtkservice)
 include_directories(${CMAKE_SOURCE_DIR}/src/inputoutput)
+include_directories(${CMAKE_SOURCE_DIR}/src/states)
+include_directories(${CMAKE_SOURCE_DIR}/src/boundarylogic)
 
 # Create executable for main
 add_executable(main src/main.cpp)
@@ -26,6 +28,8 @@ add_library(rtkservice src/rtkservice/rtkservice.cpp)
 add_library(tcpserver src/rtkservice/tcpserver.cpp)
 add_library(ledcontrol src/inputoutput/ledcontrol.cpp)
 add_library(buttons src/inputoutput/buttons.cpp)
+add_library(states src/states/states.cpp)
+add_library(boundarylogic src/boundarylogic/boundarylogic.cpp)
 
 # Find CURL package
 find_package(CURL REQUIRED)
@@ -35,6 +39,8 @@ target_link_libraries(main PRIVATE rtkservice ${RTKLIB_LIB} ${CURL_LIBRARIES})
 target_link_libraries(main PRIVATE tcpserver ${RTKLIB_LIB} ${CURL_LIBRARIES})
 target_link_libraries(main PRIVATE ledcontrol ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE buttons ${PIGPIO_LIBRARY})
+target_link_libraries(main PRIVATE states)
+target_link_libraries(main PRIVATE boundarylogic)
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
 target_include_directories(main PRIVATE /usr/local/include)

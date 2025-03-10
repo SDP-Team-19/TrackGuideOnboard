@@ -3,6 +3,7 @@
 #include "rtkservice.h"
 #include "ledcontrol.h"
 #include "buttons.h"
+#include "states.h"
 #include <pigpio.h>
 #include <iostream>
 #include <thread>
@@ -17,7 +18,9 @@ std::atomic<bool> shutdown_requested(false);  // Atomic flag
 void signal_handler(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
         shutdown_requested.store(true, std::memory_order_release);
+        std::cout << "Interrupt received. Shutting down..." << std::endl;
     } else if (signal == SIGCHLD) {
+        std::cout << "Reaping child" << std::endl;
         // Prevent zombie processes
         while (waitpid(-1, NULL, WNOHANG) > 0);
     }
@@ -41,6 +44,9 @@ int main() {
 
     Buttons buttons(16, 20, 21);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
+
+    BoundaryLogic boundary_logic;
+    States states(led_control, std::ref(boundary_logic));
 
     TCPServer server(PORT, led_control, system_state);
     server.start(shutdown_requested);
