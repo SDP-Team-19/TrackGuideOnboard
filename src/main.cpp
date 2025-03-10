@@ -46,7 +46,7 @@ int main() {
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
     BoundaryLogic boundary_logic;
-    States states(led_control, std::ref(boundary_logic));
+    States states(led_control, boundary_logic);
 
     TCPServer server(PORT, led_control, system_state);
     server.start(shutdown_requested);
