@@ -8,7 +8,11 @@
 
 // Define a simple 2D point structure
 struct Point2D {
-    double x, y;
+    double x;
+    double y;
+
+    Point2D() : x(0), y(0) {}
+    Point2D(double x, double y) : x(x), y(y) {}
 };
 
 // Create a point cloud structure for nanoflann
