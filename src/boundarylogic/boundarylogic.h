@@ -40,8 +40,26 @@ public:
     BoundaryLogic();
 
     // Delete copy constructor and copy assignment operator
-    BoundaryLogic(const BoundaryLogic&) = delete;
-    BoundaryLogic& operator=(const BoundaryLogic&) = delete;
+    BoundaryLogic(const BoundaryLogic& other)
+        : _threshold(other._threshold),
+          recorded_path(other.recorded_path),
+          _point_cloud_ptr(other._point_cloud_ptr ? std::make_unique<PointCloud>(*other._point_cloud_ptr) : nullptr),
+          _kdtree_ptr(other._kdtree_ptr ? std::make_unique<KDTree>(*other._kdtree_ptr) : nullptr) {
+        // Copy other members as needed
+    }
+
+    // Copy assignment operator
+    BoundaryLogic& operator=(const BoundaryLogic& other) {
+        if (this == &other) {
+            return *this; // Handle self-assignment
+        }
+        _threshold = other._threshold;
+        recorded_path = other.recorded_path;
+        _point_cloud_ptr = other._point_cloud_ptr ? std::make_unique<PointCloud>(*other._point_cloud_ptr) : nullptr;
+        _kdtree_ptr = other._kdtree_ptr ? std::make_unique<KDTree>(*other._kdtree_ptr) : nullptr;
+        // Copy other members as needed
+        return *this;
+    }
 
     // Default move constructor and move assignment operator
     BoundaryLogic(BoundaryLogic&&) = default;

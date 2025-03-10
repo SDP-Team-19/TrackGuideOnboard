@@ -6,7 +6,7 @@
 #include <mutex>
 
 States::States(LEDControl ledController, BoundaryLogic& boundaryLogic)
-    : ledController_(ledController), boundaryLogic_(boundaryLogic), track_loaded_(false)  {
+    : ledController_(ledController), boundaryLogic_(boundaryLogic), track_loaded_(false) {
 }
 
 void States::run_record_function(const char* content) {
