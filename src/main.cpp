@@ -48,7 +48,7 @@ int main() {
     BoundaryLogic boundary_logic;
     States states(led_control, boundary_logic);
 
-    TCPServer server(PORT, led_control, system_state);
+    TCPServer server(PORT, led_control, system_state, states);
     server.start(shutdown_requested);
 
     while(!shutdown_requested.load(std::memory_order_acquire)) {
