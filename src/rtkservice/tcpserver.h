@@ -15,10 +15,12 @@
 #include "ledcontrol.h"
 #include "buttons.h"
 #include <atomic>
+#include "boundarylogic.h"
+#include "states.h"
 
 class TCPServer {
 public:
-    TCPServer(int port, LEDControl ledController, std::atomic<SystemState>& systemState);
+    TCPServer(int port, LEDControl ledController, std::atomic<SystemState>& systemState, States& states);
     ~TCPServer();
     void start(std::atomic<bool>& shutdown_requested);
 
@@ -26,12 +28,10 @@ private:
     int serverSocket_;
     LEDControl ledController_;
     std::atomic<SystemState>& systemState_;
+    States& states_;
     struct sockaddr_in serverAddr_;
 
     void handle_client(int clientSocket);
-    void run_record_function(const char* content);
-    void run_play_function(const char* content);
-    void run_reset_function();
     void close_server();
 };
 

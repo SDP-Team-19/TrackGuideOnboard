@@ -5,7 +5,7 @@
 #define BUFFER_SIZE 1024
 
 
-TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemState>& systemState) : ledController_(led_controller), systemState_(systemState) {
+TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemState>& systemState, States& states) : ledController_(led_controller), systemState_(systemState), states_(states) {
     // Create a socket
     serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket_ == -1) {
@@ -137,14 +137,14 @@ void TCPServer::handle_client(int client_socket) {
 
         // Run the function in a new process
         if (currentState == SystemState::RECORDING) {
-            run_record_function(buffer);
+            states_.run_record_function(buffer);
         }else if (currentState == SystemState::PLAYING)
         {
-            run_play_function(buffer);
+            states_.run_play_function(buffer);
         }else if (currentState == SystemState::RESETTING)
         {
-
             systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
+            states_.run_reset_function();
         }
         
         
