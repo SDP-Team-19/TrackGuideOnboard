@@ -30,7 +30,7 @@ int main() {
 
     gpioCfgSetInternals(1 << 10);
 
-    LEDControl led_control(12, 30);
+    LEDControl led_control(12, 28);
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);

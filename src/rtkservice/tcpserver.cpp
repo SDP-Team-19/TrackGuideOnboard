@@ -140,7 +140,7 @@ void TCPServer::handle_client(int client_socket) {
             run_record_function(buffer);
         }else if (currentState == SystemState::PLAYING)
         {
-            /* code */
+            run_play_function(buffer);
         }else if (currentState == SystemState::RESETTING)
         {
 
