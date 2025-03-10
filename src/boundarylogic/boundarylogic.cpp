@@ -1,6 +1,7 @@
 // filepath: /Users/mitchellsylvia/TrackGuideOnboard/src/boundarylogic/boundarylogic.cpp
 #include "boundarylogic.h"
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 using namespace nanoflann;
