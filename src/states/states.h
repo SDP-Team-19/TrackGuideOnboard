@@ -12,7 +12,7 @@ public:
     void run_reset_function();
 private:
     LEDControl ledController_;
-    BoundaryLogic boundaryLogic_;
+    BoundaryLogic& boundaryLogic_;
     bool track_loaded_;  // Flag to indicate whether the track has been loaded
 };
 
