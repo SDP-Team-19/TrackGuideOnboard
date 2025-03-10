@@ -12,17 +12,17 @@ LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength)
         .dmanum = 10,
         .channel = {
             [0] = {
+                .gpionum = 0,
+                .invert = 0,
+                .count = 0,
+                .brightness = 0,
+            },
+            [1] = {
                 .gpionum = gpioPin,
                 .invert = 0,
                 .count = stripLength,
                 .strip_type = WS2812_STRIP,
                 .brightness = 255,
-            },
-            [1] = {
-                .gpionum = 0,
-                .invert = 0,
-                .count = 0,
-                .brightness = 0,
             },
         },
     };
