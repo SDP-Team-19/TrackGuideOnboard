@@ -66,21 +66,45 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     recorded_path.clear();
     _point_cloud_ptr->points.clear();
 
+    // Ensure _kdtree_ptr is properly initialized
+    if (!_kdtree_ptr) {
+        std::cerr << "_kdtree_ptr is not initialized." << std::endl;
+        // Additional handling or initialization if necessary
+    }
     PointCloud point_cloud;
     std::string line;
+    bool loop_entered = false;
     while (std::getline(file, line)) {
+        loop_entered = true;
         std::istringstream ss(line);
         std::string lat_str, lon_str;
         std::cout << "Reading line: " << line << std::endl;
         if (std::getline(ss, lat_str, ',') && std::getline(ss, lon_str, ',')) {
             std::cout << "Read Latitude: " << lat_str << ", Longitude: " << lon_str << std::endl;
-            double latitude = std::stof(lat_str);
-            double longitude = std::stof(lon_str);
-            recorded_path.emplace_back(latitude, longitude);
-            point_cloud.points.push_back({latitude, longitude});
+            double latitude, longitude;
+            try {
+                double latitude = std::stod(lat_str);
+                double longitude = std::stod(lon_str);
+                // Additional validation if necessary
+                recorded_path.emplace_back(latitude, longitude);
+                point_cloud.points.push_back({latitude, longitude});
+            } catch (const std::invalid_argument& e) {
+                std::cerr << "Invalid number format: " << e.what() << std::endl;
+                continue; // Skip to the next line or handle the error as needed
+            }
         }
     }
+
+    if (!loop_entered) {
+        std::cout << "No lines read from the file." << std::endl;
+    }
+
     file.close();
+
+    if (point_cloud.points.empty()) {
+        std::cerr << "Point cloud is empty. Cannot build KD-Tree." << std::endl;
+        return;
+    }
 
     // Load the KDTree into the private variable kdtree
     _kdtree_ptr = std::make_unique<KDTree>(2, point_cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
