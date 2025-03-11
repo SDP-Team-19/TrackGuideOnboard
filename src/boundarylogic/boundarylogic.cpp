@@ -18,8 +18,8 @@ BoundaryLogic::BoundaryLogic() : _threshold(0.0f) {}
 
 // Function to calculate distance given latitude and longitude
 double BoundaryLogic::calculate_distance(double latitude, double longitude) {
-    std::cout << "Locking mutex" << std::endl;
-    std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
+    // std::cout << "Locking mutex" << std::endl;
+    // std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
 
     KNNResultSet<double> resultSet(1);
     Point2D userPos = {latitude, longitude};  // User's position
@@ -53,8 +53,8 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
 
 // Function to load track from a saved CSV file
 void BoundaryLogic::load_track(const std::string& file_path) {
-    std::cout << "Locking mutex for loading track" << std::endl;
-    std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
+    // std::cout << "Locking mutex for loading track" << std::endl;
+    // std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
 
     std::cout << "Loading track from file: " << file_path << std::endl;
     std::ifstream file(file_path);
