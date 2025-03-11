@@ -79,7 +79,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
 
     PointCloud point_cloud;
     std::string line;
-    std::cout << "point cloud initi" << std::endl;
+    std::cout << "point cloud initialized" << std::endl;
     bool loop_entered = false;
     while (std::getline(file, line)) {
         loop_entered = true;

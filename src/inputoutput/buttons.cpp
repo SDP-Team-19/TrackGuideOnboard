@@ -77,7 +77,7 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
         prevPlayButtonState_ = playState;
 
         // Add a small delay to prevent high CPU usage
-        gpioDelay(200000); // 100 milliseconds
+        gpioDelay(500000); // 100 milliseconds
     }
     std::cout << "Button monitoring thread shutting down..." << std::endl;
 }
