@@ -76,7 +76,7 @@ int main() {
     BoundaryLogic boundary_logic;
     States states(led_control, boundary_logic);
 
-    RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
+    RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
     rtk_service_ptr = &rtk_service;
     rtk_service.start_server();
     
