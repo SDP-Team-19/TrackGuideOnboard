@@ -75,11 +75,11 @@ void States::run_play_function(const char* content) {
         } else {
             if (distance > -100)
             {
-                ledController_.indicate_right(Color::GREEN);
+                ledController_.indicate_left(Color::GREEN);
             }
             else
             {
-                ledController_.indicate_right(Color::RED);
+                ledController_.indicate_left(Color::RED);
             }
         }
         

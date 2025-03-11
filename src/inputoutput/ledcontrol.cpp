@@ -1,5 +1,6 @@
 // filepath: /Users/mitchellsylvia/TrackGuideOnboard/src/ledcontrol/ledcontrol.cpp
 #include "ledcontrol.h"
+#define LEFTRIGHTSIZE 14
 
 LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength)
     : _stripLength(stripLength) {
@@ -37,7 +38,7 @@ void LEDControl::indicate_left(Color color) {
     std::cout << "Indicating left with color " << static_cast<int>(color) << std::endl;
 
     ws2811_led_t led_color = map_color(color);
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < LEFTRIGHTSIZE; ++i) {
         _ledstring.channel[1].leds[i] = led_color;
     }
 
@@ -48,7 +49,7 @@ void LEDControl::indicate_right(Color color) {
     std::cout << "Indicating right with color " << static_cast<int>(color) << std::endl;
 
     ws2811_led_t led_color = map_color(color);
-    for (int i = _stripLength - 5; i < _stripLength; ++i) {
+    for (int i = _stripLength - LEFTRIGHTSIZE; i < _stripLength; ++i) {
         _ledstring.channel[1].leds[i] = led_color;
     }
 
