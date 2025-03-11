@@ -38,22 +38,18 @@ int main() {
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
 
-    RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
-    rtk_service_ptr = &rtk_service;
-    rtk_service.start_server();
-
     Buttons buttons(16, 20, 21);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
     BoundaryLogic boundary_logic;
     States states(led_control, boundary_logic);
 
+    RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv_no_logs.conf");
+    rtk_service_ptr = &rtk_service;
+    rtk_service.start_server();
+    
     TCPServer server(PORT, led_control, system_state, states);
     server.start(shutdown_requested);
-
-    while(!shutdown_requested.load(std::memory_order_acquire)) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
 
     std::cout << "Shutting down safely..." << std::endl;
 
