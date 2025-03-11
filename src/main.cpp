@@ -38,7 +38,7 @@ int main() {
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
 
-    Buttons buttons(16, 20, 21);
+    Buttons buttons(16, 20, 21, system_state);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
     BoundaryLogic boundary_logic;

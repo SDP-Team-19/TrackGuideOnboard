@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <iostream>
 
-Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin)
-    : recordPin_(recordPin), resetPin_(resetPin), playPin_(playPin), systemState_(SystemState::STANDBY) {
+Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, std::atomic<SystemState>& systemState)
+    : recordPin_(recordPin), resetPin_(resetPin), playPin_(playPin), systemState_(systemState) {
     prevPlayButtonState_ = ButtonState::RELEASED;
     prevRecordButtonState_ = ButtonState::RELEASED;
     prevResetButtonState_ = ButtonState::RELEASED;
