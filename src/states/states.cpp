@@ -23,7 +23,6 @@ void States::run_record_function(const char* content) {
     iss >> date >> time >> latitude >> longitude;
 
     // Use a mutex to avoid race conditions when writing to the file
-    static std::mutex file_mutex;
     std::lock_guard<std::mutex> lock(file_mutex);
 
     // Open the CSV file in append mode
@@ -68,6 +67,11 @@ void States::run_play_function(const char* content) {
 }
 
 void States::run_reset_function() {
-    // Implementation for run_record_function without parameters
+    std::lock_guard<std::mutex> lock(file_mutex);
+    if (remove("coordinates.csv") != 0) {
+        std::cerr << "Error deleting coordinates.csv" << std::endl;
+    } else {
+        std::cout << "coordinates.csv successfully deleted" << std::endl;
+    }
     std::cout << "Running record function without parameters." << std::endl;
 }
