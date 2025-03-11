@@ -5,15 +5,15 @@
 #include <cstdint>
 #include <semaphore.h>
 
-struct SharedMemory {
-    SystemState state;
-};
-
 enum class SystemState {
     STANDBY,
     RECORDING,
     PLAYING,
     RESETTING
+};
+
+struct SharedMemory {
+    SystemState state;
 };
 
 enum class ButtonState {
