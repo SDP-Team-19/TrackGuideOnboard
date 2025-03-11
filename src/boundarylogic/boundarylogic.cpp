@@ -10,6 +10,7 @@ using namespace nanoflann;
 // Constructor that initializes max_distance
 BoundaryLogic::BoundaryLogic(double threshold) : _threshold(threshold), _point_cloud_ptr(std::make_unique<PointCloud>()), 
 _kdtree_ptr(std::make_unique<KDTree>(2, *_point_cloud_ptr)) {
+    std::cout << "BoundaryLogic initialized with threshold: " << threshold << std::endl;
 }
 
 // Default constructor
@@ -25,21 +26,28 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     double queryPt[2] = {userPos.x, userPos.y};
     size_t nearestIdx;
     double outDistSqr;
+    std::cout << "initialized calc variables" << std::endl;
 
     if (recorded_path.empty()) {
         throw std::runtime_error("Recorded path is empty.");
     }
 
     resultSet.init(&nearestIdx, &outDistSqr);
+    std::cout << "initialized result set" << std::endl;
     SearchParameters params;
     params.sorted = false;
     params.eps = 0.0;
+    std::cout << "finding neighbors" << std::endl;
     _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
+    std::cout << "neighbors found" << std::endl;
 
     size_t nextIdx = (nearestIdx < _point_cloud_ptr->points.size() - 1) ? nearestIdx + 1 : nearestIdx - 1;
+    std::cout << "next index found" << std::endl;
 
+    std::cout << "computing signed perp distance" << std::endl;
     double signedPerpDist = computeSignedPerpendicularDistance(userPos, _point_cloud_ptr->points[nearestIdx], _point_cloud_ptr->points[nextIdx]);
 
+    std::cout << "distance found" << std::endl;
     return signedPerpDist;
 }
 
@@ -51,6 +59,9 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + file_path);
     }
+
+    recorded_path.clear();
+    _point_cloud_ptr->points.clear();
 
     PointCloud point_cloud;
     std::string line;
