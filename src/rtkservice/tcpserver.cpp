@@ -1,6 +1,27 @@
 #include "tcpserver.h"
 #include "buttons.h"
 
+std::ostream& operator<<(std::ostream& os, const SystemState& state) {
+    switch (state) {
+        case SystemState::STANDBY:
+            os << "STANDBY";
+            break;
+        case SystemState::RECORDING:
+            os << "RECORDING";
+            break;
+        case SystemState::PLAYING:
+            os << "PLAYING";
+            break;
+        case SystemState::RESETTING:
+            os << "RESETTING";
+            break;
+        default:
+            os << "UNKNOWN";
+            break;
+    }
+    return os;
+}
+
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
 
@@ -129,6 +150,7 @@ void TCPServer::handle_client(int client_socket) {
     while ((bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0)) > 0) {
         buffer[bytes_received] = '\0'; // Null-terminate the received data
         std::cout << "Received: " << buffer << std::endl;
+        std::cout << "System state: " << currentState << std::endl;
 
         // Echo the message back to the client
         send(client_socket, buffer, bytes_received, 0);
