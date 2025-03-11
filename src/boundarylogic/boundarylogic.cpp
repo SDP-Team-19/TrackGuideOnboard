@@ -56,11 +56,13 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     std::cout << "Locking mutex for loading track" << std::endl;
     std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
 
+    std::cout << "Loading track from file: " << file_path << std::endl;
     std::ifstream file(file_path);
     if (!file.is_open()) {
         throw std::runtime_error("Could not open file: " + file_path);
     }
 
+    std::cout << "Clearning variables" << std::endl;
     recorded_path.clear();
     _point_cloud_ptr->points.clear();
 
