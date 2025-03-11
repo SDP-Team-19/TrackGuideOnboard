@@ -135,12 +135,15 @@ void TCPServer::handle_client(int client_socket) {
 
         // Run the function in a new process
         if (currentState == SystemState::RECORDING) {
+            std::cout << "Recording" << std::endl;
             states_.run_record_function(buffer);
         }else if (currentState == SystemState::PLAYING)
         {
+            std::cout << "Playing" << std::endl;
             states_.run_play_function(buffer);
         }else if (currentState == SystemState::RESETTING)
         {
+            std::cout << "Resetting" << std::endl;
             systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
             states_.run_reset_function();
         }
