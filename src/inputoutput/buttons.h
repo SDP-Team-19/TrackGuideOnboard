@@ -4,7 +4,10 @@
 #include <atomic>
 #include <cstdint>
 #include <semaphore.h>
-#include "tcpserver.h"
+
+struct SharedMemory {
+    SystemState state;
+};
 
 enum class SystemState {
     STANDBY,
@@ -16,10 +19,6 @@ enum class SystemState {
 enum class ButtonState {
     PRESSED,
     RELEASED
-};
-
-struct SharedMemory {
-    SystemState state;
 };
 
 class Buttons {
