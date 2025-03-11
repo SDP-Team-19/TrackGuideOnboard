@@ -166,6 +166,7 @@ void TCPServer::handle_client(int client_socket) {
             close(client_socket);
             return;
         }
+        std::cout << "semaphore claimed" << std::endl;
 
         // Run the function in a new process
         if (shared_memory_->state == SystemState::RECORDING) {
