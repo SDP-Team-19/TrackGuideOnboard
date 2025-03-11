@@ -45,6 +45,7 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     if (!_point_cloud_ptr) {
         throw std::runtime_error("uninitialized point cloud.");
     }
+    cout << "point cloud initialized" << endl;
 
     if (nearestIdx == 0) {
         nextIdx = 1;
