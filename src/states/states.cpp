@@ -10,6 +10,7 @@ States::States(LEDControl ledController, BoundaryLogic& boundaryLogic)
 }
 
 void States::run_record_function(const char* content) {
+    track_loaded_ = false;
     // Implement the function you want to run in a new process
     std::cout << "Running record function in a new process." << std::endl;
 
@@ -31,6 +32,8 @@ void States::run_record_function(const char* content) {
         std::cerr << "Failed to open coordinates.csv" << std::endl;
         return;
     }
+    outfile.precision(8);
+    outfile << std::fixed;
 
     // Write the latitude and longitude to the CSV file
     outfile << latitude << ", " << longitude << std::endl;
@@ -50,6 +53,7 @@ void States::run_play_function(const char* content) {
     iss >> date >> time >> latitude >> longitude;
 
     if (!track_loaded_) {
+        std::cout << "Loading track from coordinates.csv" << std::endl;
         boundaryLogic_.load_track("coordinates.csv");
         track_loaded_ = true;
     }

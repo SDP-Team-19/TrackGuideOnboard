@@ -2,6 +2,7 @@
 #include "boundarylogic.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 using namespace std;
 using namespace nanoflann;
@@ -16,6 +17,7 @@ BoundaryLogic::BoundaryLogic() : _threshold(0.0f) {}
 
 // Function to calculate distance given latitude and longitude
 double BoundaryLogic::calculate_distance(double latitude, double longitude) {
+    std::cout << "Locking mutex" << std::endl;
     std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
 
     KNNResultSet<double> resultSet(1);
@@ -67,6 +69,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     // Load the KDTree into the private variable kdtree
     _kdtree_ptr = std::make_unique<KDTree>(2, point_cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
     _kdtree_ptr->buildIndex();
+    std::cout << "Track loaded successfully" << std::endl;
 }
 
 double BoundaryLogic::computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next) {
