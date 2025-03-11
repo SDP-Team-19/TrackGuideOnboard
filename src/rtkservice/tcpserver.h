@@ -25,7 +25,6 @@
 #define BUFFER_SIZE 1024
 
 struct SharedMemory {
-    char buffer[BUFFER_SIZE];
     SystemState state;
 };
 
