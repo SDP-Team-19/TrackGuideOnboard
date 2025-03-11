@@ -3,9 +3,15 @@
 #include <pigpio.h>
 #include <stdexcept>
 #include <iostream>
+#include <sys/mman.h>   // For shm_open, mmap, etc.
+#include <fcntl.h>      // For O_* constants
+#include <unistd.h>     // For ftruncate
+#include <sys/stat.h>   // For mode constants
+#include <semaphore.h>  // For semaphores
+#include <tcpserver.h>
 
-Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, std::atomic<SystemState>& systemState)
-    : recordPin_(recordPin), resetPin_(resetPin), playPin_(playPin), systemState_(systemState) {
+Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore)
+    : recordPin_(recordPin), resetPin_(resetPin), playPin_(playPin), shared_memory_(shared_memory), semaphore_(semaphore) {
     prevPlayButtonState_ = ButtonState::RELEASED;
     prevRecordButtonState_ = ButtonState::RELEASED;
     prevResetButtonState_ = ButtonState::RELEASED;
@@ -30,36 +36,42 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
         recordState = get_button_state(recordPin_);
         resetState = get_button_state(resetPin_);
         playState = get_button_state(playPin_);
-        SystemState currentSystemState = systemState_.load(std::memory_order_relaxed);
+
+        // Lock the semaphore to access shared memory
+        sem_wait(semaphore_);
+        SystemState currentSystemState = shared_memory_->state;
 
         if (recordState == ButtonState::PRESSED && prevRecordButtonState_ == ButtonState::RELEASED) {
             // Record button pressed
             if (currentSystemState == SystemState::RECORDING) {
-                systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
+                shared_memory_->state = SystemState::STANDBY;
                 std::cout << "Record button pressed, running in standby" << std::endl;
             } else {
-                systemState_.store(SystemState::RECORDING, std::memory_order_relaxed);
+                shared_memory_->state = SystemState::RECORDING;
                 std::cout << "Record button pressed, running in record" << std::endl;
             }
         }
 
         if (resetState == ButtonState::PRESSED && prevResetButtonState_ == ButtonState::RELEASED) {
             // Reset button pressed
-            systemState_.store(SystemState::RESETTING, std::memory_order_relaxed);
+            shared_memory_->state = SystemState::RESETTING;
             std::cout << "Reset button pressed" << std::endl;
         }
 
         if (playState == ButtonState::PRESSED && prevPlayButtonState_ == ButtonState::RELEASED) {
             // Play button pressed
             if (currentSystemState == SystemState::PLAYING) {
-                systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
+                shared_memory_->state = SystemState::STANDBY;
                 std::cout << "Play button pressed, running in standby" << std::endl;
             } else {
-                systemState_.store(SystemState::PLAYING, std::memory_order_relaxed);
+                shared_memory_->state = SystemState::PLAYING;
                 std::cout << "Play button pressed, running in play" << std::endl;
             }
-            
         }
+
+        // Unlock the semaphore
+        sem_post(semaphore_);
+
         prevRecordButtonState_ = recordState;
         prevResetButtonState_ = resetState;
         prevPlayButtonState_ = playState;

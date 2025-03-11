@@ -1,5 +1,10 @@
 #include "tcpserver.h"
 #include "buttons.h"
+#include <sys/mman.h>   // For shm_open, mmap, etc.
+#include <fcntl.h>      // For O_* constants
+#include <unistd.h>     // For ftruncate
+#include <sys/stat.h>   // For mode constants
+#include <semaphore.h>  // For semaphores
 
 std::ostream& operator<<(std::ostream& os, const SystemState& state) {
     switch (state) {
@@ -24,9 +29,17 @@ std::ostream& operator<<(std::ostream& os, const SystemState& state) {
 
 #define BACKLOG 10
 #define BUFFER_SIZE 1024
+#define SHM_NAME "/tcpserver_shm"
+#define SEM_NAME "/tcpserver_sem"
+#define SHM_SIZE sizeof(SharedMemory)
 
+struct SharedMemory {
+    char buffer[BUFFER_SIZE];
+    SystemState state;
+};
 
-TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemState>& systemState, States& states) : ledController_(led_controller), systemState_(systemState), states_(states) {
+TCPServer::TCPServer(int port, LEDControl led_controller, States& states, SharedMemory* shared_memory, sem_t* semaphore) 
+    : ledController_(led_controller), states_(states), shared_memory_(shared_memory), semaphore_(semaphore) {
     // Create a socket
     serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket_ == -1) {
@@ -64,7 +77,6 @@ TCPServer::TCPServer(int port, LEDControl led_controller, std::atomic<SystemStat
 
     std::cout << "Server listening on port " << port << std::endl;
 }
-
 
 TCPServer::~TCPServer() {
     close_server();
@@ -144,36 +156,44 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 void TCPServer::handle_client(int client_socket) {
     char buffer[BUFFER_SIZE];
     ssize_t bytes_received;
-    SystemState currentState = systemState_.load(std::memory_order_relaxed);
 
     // Communicate with the client
     while ((bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0)) > 0) {
         buffer[bytes_received] = '\0'; // Null-terminate the received data
         std::cout << "Received: " << buffer << std::endl;
-        std::cout << "System state: " << currentState << std::endl;
 
         // Echo the message back to the client
         send(client_socket, buffer, bytes_received, 0);
 
+        // Acquire the semaphore before accessing shared memory
+        if (sem_wait(semaphore_) == -1) {
+            std::cerr << "sem_wait() failed: " << strerror(errno) << std::endl;
+            close(client_socket);
+            return;
+        }
+
         // Run the function in a new process
-        if (currentState == SystemState::RECORDING) {
+        if (shared_memory_->state == SystemState::RECORDING) {
             std::cout << "Recording" << std::endl;
             states_.run_record_function(buffer);
-        }else if (currentState == SystemState::PLAYING)
-        {
+        } else if (shared_memory_->state == SystemState::PLAYING) {
             std::cout << "Playing" << std::endl;
             states_.run_play_function(buffer);
-        }else if (currentState == SystemState::RESETTING)
-        {
+        } else if (shared_memory_->state == SystemState::RESETTING) {
             std::cout << "Resetting" << std::endl;
-            systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
+            shared_memory_->state = SystemState::STANDBY;
             states_.run_reset_function();
         }
-        
-        
+
+        // Release the semaphore after accessing shared memory
+        if (sem_post(semaphore_) == -1) {
+            std::cerr << "sem_post() failed: " << strerror(errno) << std::endl;
+            close(client_socket);
+            return;
+        }
     }
 
-    if (bytes_received == -1) {
+        if (bytes_received == -1) {
         std::cerr << "recv() error: " << strerror(errno) << std::endl;
     }
 
@@ -186,5 +206,6 @@ void TCPServer::close_server() {
         close(serverSocket_);
     }
     serverSocket_ = -1;
+
     std::cout << "Server closed." << std::endl;
 }

@@ -17,19 +17,32 @@
 #include <atomic>
 #include "boundarylogic.h"
 #include "states.h"
+#include <sys/mman.h>   // For shm_open, mmap, etc.
+#include <fcntl.h>      // For O_* constants
+#include <sys/stat.h>   // For mode constants
+#include <semaphore.h>  // For semaphores
+
+#define BUFFER_SIZE 1024
+
+struct SharedMemory {
+    char buffer[BUFFER_SIZE];
+    SystemState state;
+};
 
 class TCPServer {
 public:
-    TCPServer(int port, LEDControl ledController, std::atomic<SystemState>& systemState, States& states);
+    TCPServer(int port, LEDControl ledController, States& states, SharedMemory* shared_memory, sem_t* semaphore);
     ~TCPServer();
     void start(std::atomic<bool>& shutdown_requested);
 
 private:
     int serverSocket_;
     LEDControl ledController_;
-    std::atomic<SystemState>& systemState_;
     States& states_;
     struct sockaddr_in serverAddr_;
+
+    SharedMemory* shared_memory_;
+    sem_t* semaphore_;
 
     void handle_client(int clientSocket);
     void close_server();

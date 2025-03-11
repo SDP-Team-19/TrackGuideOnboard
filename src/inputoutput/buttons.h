@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <semaphore.h>
 
 enum class SystemState {
     STANDBY,
@@ -16,16 +17,21 @@ enum class ButtonState {
     RELEASED
 };
 
+struct SharedMemory {
+    SystemState state;
+};
+
 class Buttons {
 public:
-    Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, std::atomic<SystemState>& systemState);
+    Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore);
     void monitor_button(std::atomic<bool>& shutdown_requested);
 
 private:
     uint8_t recordPin_;
     uint8_t resetPin_;
     uint8_t playPin_;
-    std::atomic<SystemState>& systemState_;
+    SharedMemory* shared_memory_;
+    sem_t* semaphore_;
     ButtonState prevRecordButtonState_;
     ButtonState prevResetButtonState_;
     ButtonState prevPlayButtonState_;
