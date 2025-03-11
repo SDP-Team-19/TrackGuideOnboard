@@ -24,10 +24,6 @@
 
 #define BUFFER_SIZE 1024
 
-struct SharedMemory {
-    SystemState state;
-};
-
 class TCPServer {
 public:
     TCPServer(int port, LEDControl ledController, States& states, SharedMemory* shared_memory, sem_t* semaphore);

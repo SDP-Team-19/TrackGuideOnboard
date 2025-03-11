@@ -18,6 +18,10 @@ enum class ButtonState {
     RELEASED
 };
 
+struct SharedMemory {
+    SystemState state;
+};
+
 class Buttons {
 public:
     Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore);
