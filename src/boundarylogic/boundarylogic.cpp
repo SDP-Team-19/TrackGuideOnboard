@@ -53,6 +53,7 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
 
 // Function to load track from a saved CSV file
 void BoundaryLogic::load_track(const std::string& file_path) {
+    std::cout << "Locking mutex for loading track" << std::endl;
     std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
 
     std::ifstream file(file_path);
@@ -69,6 +70,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
         std::istringstream ss(line);
         std::string lat_str, lon_str;
         if (std::getline(ss, lat_str, ',') && std::getline(ss, lon_str, ',')) {
+            std::cout << "Read Latitude: " << lat_str << ", Longitude: " << lon_str << std::endl;
             double latitude = std::stof(lat_str);
             double longitude = std::stof(lon_str);
             recorded_path.emplace_back(latitude, longitude);
