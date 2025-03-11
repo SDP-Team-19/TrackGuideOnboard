@@ -42,6 +42,10 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     std::cout << "neighbors found" << std::endl;
 
     size_t nextIdx;
+    if (!_point_cloud_ptr) {
+        throw std::runtime_error("uninitialized point cloud.");
+    }
+
     if (nearestIdx == 0) {
         nextIdx = 1;
     } else if (nearestIdx == _point_cloud_ptr->points.size() - 1) {
