@@ -116,6 +116,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     // Load the KDTree into the private variable kdtree
     _kdtree_ptr = std::make_unique<KDTree>(2, point_cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
     _kdtree_ptr->buildIndex();
+    _point_cloud_ptr = std::make_unique<PointCloud>(point_cloud);
     std::cout << "Track loaded successfully" << std::endl;
 }
 
