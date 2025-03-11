@@ -63,16 +63,16 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     }
 
     std::cout << "Clearning variables" << std::endl;
-    recorded_path.clear();
-    _point_cloud_ptr->points.clear();
 
     // Ensure _kdtree_ptr is properly initialized
     if (!_kdtree_ptr) {
         std::cerr << "_kdtree_ptr is not initialized." << std::endl;
         // Additional handling or initialization if necessary
     }
+
     PointCloud point_cloud;
     std::string line;
+    std::cout << "point cloud initi" << std::endl;
     bool loop_entered = false;
     while (std::getline(file, line)) {
         loop_entered = true;
