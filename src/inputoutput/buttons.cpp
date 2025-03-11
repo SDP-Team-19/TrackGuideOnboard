@@ -11,8 +11,8 @@
 #include <tcpserver.h>
 #include "semaphoreguard.h"
 
-Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore)
-    : recordPin_(recordPin), resetPin_(resetPin), playPin_(playPin), shared_memory_(shared_memory), semaphore_(semaphore) {
+Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore, KinesisStream& kinesisStream)
+    : recordPin_(recordPin), resetPin_(resetPin), playPin_(playPin), shared_memory_(shared_memory), semaphore_(semaphore), kinesisStream_(kinesisStream){
     prevPlayButtonState_ = ButtonState::RELEASED;
     prevRecordButtonState_ = ButtonState::RELEASED;
     prevResetButtonState_ = ButtonState::RELEASED;
@@ -52,6 +52,9 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
                 std::cout << "Record button pressed, running in standby" << std::endl;
             } else {
                 shared_memory_->state = SystemState::RECORDING;
+                kinesisStream_.sendModeData("line_reset", 0.00001);
+                kinesisStream_.sendModeData("bound_reset", 0.00001);
+                kinesisStream_.sendModeData("record", 0.00001);
                 std::cout << "Record button pressed, running in record" << std::endl;
             }
         }
@@ -59,6 +62,8 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
         if (resetState == ButtonState::PRESSED && prevResetButtonState_ == ButtonState::RELEASED) {
             // Reset button pressed
             shared_memory_->state = SystemState::RESETTING;
+            kinesisStream_.sendModeData("line_reset", 0.00001);
+            kinesisStream_.sendModeData("bound_reset", 0.00001);
             std::cout << "Reset button pressed" << std::endl;
         }
 
@@ -68,6 +73,8 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
                 shared_memory_->state = SystemState::STANDBY;
                 std::cout << "Play button pressed, running in standby" << std::endl;
             } else {
+                kinesisStream_.sendModeData("line_reset", 0.00001);
+                kinesisStream_.sendModeData("play", 0.00001);
                 shared_memory_->state = SystemState::PLAYING;
                 std::cout << "Play button pressed, running in play" << std::endl;
             }

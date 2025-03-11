@@ -31,6 +31,7 @@ add_library(buttons src/inputoutput/buttons.cpp)
 add_library(semaphoreguard src/inputoutput/semaphoreguard.cpp)
 add_library(states src/states/states.cpp)
 add_library(boundarylogic src/boundarylogic/boundarylogic.cpp)
+add_library(kinesis src/inputoutput/kinesis.cpp)
 
 # Find CURL package
 find_package(CURL REQUIRED)

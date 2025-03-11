@@ -5,8 +5,8 @@
 #include <fstream>
 #include <mutex>
 
-States::States(LEDControl ledController, BoundaryLogic& boundaryLogic)
-    : ledController_(ledController), boundaryLogic_(boundaryLogic), track_loaded_(false) {
+States::States(LEDControl ledController, BoundaryLogic& boundaryLogic, KinesisStream& kinesisStream)
+    : ledController_(ledController), boundaryLogic_(boundaryLogic), track_loaded_(false), kinesisStream_(kinesisStream) {
 }
 
 void States::run_record_function(const char* content) {
@@ -21,6 +21,7 @@ void States::run_record_function(const char* content) {
     double latitude, longitude;
 
     iss >> date >> time >> latitude >> longitude;
+    kinesisStream_.sendPositionData(latitude, longitude);
 
     // Use a mutex to avoid race conditions when writing to the file
     std::lock_guard<std::mutex> lock(file_mutex);
@@ -50,6 +51,7 @@ void States::run_play_function(const char* content) {
     double latitude, longitude;
 
     iss >> date >> time >> latitude >> longitude;
+    kinesisStream_.sendPositionData(latitude, longitude);
 
     if (!track_loaded_) {
         std::cout << "Loading track from coordinates.csv" << std::endl;

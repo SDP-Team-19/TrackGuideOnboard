@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cstdint>
 #include <semaphore.h>
+#include "kinesis.h"
 
 enum class SystemState {
     STANDBY,
@@ -23,7 +24,7 @@ enum class ButtonState {
 
 class Buttons {
 public:
-    Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore);
+    Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore, KinesisStream& kinesisStream);
     void monitor_button(std::atomic<bool>& shutdown_requested);
 
 private:
@@ -32,6 +33,7 @@ private:
     uint8_t playPin_;
     SharedMemory* shared_memory_;
     sem_t* semaphore_;
+    KinesisStream& kinesisStream_;
     ButtonState prevRecordButtonState_;
     ButtonState prevResetButtonState_;
     ButtonState prevPlayButtonState_;
