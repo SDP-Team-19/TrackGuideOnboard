@@ -162,12 +162,16 @@ void TCPServer::handle_client(int client_socket) {
         send(client_socket, buffer, bytes_received, 0);
 
         // Acquire the semaphore before accessing shared memory
-        if (sem_wait(semaphore_) == -1) {
-            std::cerr << "sem_wait() failed: " << strerror(errno) << std::endl;
+        if (sem_trywait(semaphore_) == -1) {
+            if (errno == EAGAIN) {
+                std::cerr << "sem_trywait() would block, semaphore is already locked." << std::endl;
+            } else {
+                std::cerr << "sem_trywait() failed: " << strerror(errno) << std::endl;
+            }
             close(client_socket);
             return;
         }
-        std::cout << "semaphore claimed" << std::endl;
+        std::cout << "Semaphore claimed" << std::endl;
 
         // Run the function in a new process
         if (shared_memory_->state == SystemState::RECORDING) {
