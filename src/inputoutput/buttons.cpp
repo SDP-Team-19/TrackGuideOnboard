@@ -36,10 +36,10 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
             // Record button pressed
             if (currentSystemState == SystemState::RECORDING) {
                 systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
-                std::cout << "Record button pressed" << std::endl;
+                std::cout << "Record button pressed, running in standby" << std::endl;
             } else {
                 systemState_.store(SystemState::RECORDING, std::memory_order_relaxed);
-                std::cout << "Record button pressed" << std::endl;
+                std::cout << "Record button pressed, running in record" << std::endl;
             }
         }
 
@@ -53,10 +53,10 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
             // Play button pressed
             if (currentSystemState == SystemState::PLAYING) {
                 systemState_.store(SystemState::STANDBY, std::memory_order_relaxed);
-                std::cout << "Play button pressed" << std::endl;
+                std::cout << "Play button pressed, running in standby" << std::endl;
             } else {
                 systemState_.store(SystemState::PLAYING, std::memory_order_relaxed);
-                std::cout << "Play button pressed" << std::endl;
+                std::cout << "Play button pressed, running in play" << std::endl;
             }
             
         }
