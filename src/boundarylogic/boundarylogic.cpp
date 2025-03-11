@@ -10,6 +10,7 @@ using namespace nanoflann;
 // Constructor that initializes max_distance
 BoundaryLogic::BoundaryLogic(double threshold) : _threshold(threshold), _point_cloud_ptr(std::make_unique<PointCloud>()), 
 _kdtree_ptr(std::make_unique<KDTree>(2, *_point_cloud_ptr)) {
+    _point_cloud_ptr->points.clear(); // Initialize the points member
     std::cout << "BoundaryLogic initialized with threshold: " << threshold << std::endl;
 }
 
@@ -45,7 +46,10 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     if (!_point_cloud_ptr) {
         throw std::runtime_error("uninitialized point cloud.");
     }
-    cout << "point cloud initialized" << endl;
+    for (const auto& point : _point_cloud_ptr->points) {
+        std::cout << "Latitude: " << point.x << ", Longitude: " << point.y << std::endl;
+    }
+    cout << "point cloud pointer is initialized" << endl;
 
     if (nearestIdx == 0) {
         nextIdx = 1;
@@ -105,6 +109,11 @@ void BoundaryLogic::load_track(const std::string& file_path) {
                 continue; // Skip to the next line or handle the error as needed
             }
         }
+    }
+
+    std::cout << "Printing all points in point_cloud:" << std::endl;
+    for (const auto& point : point_cloud.points) {
+        std::cout << "Latitude: " << point.x << ", Longitude: " << point.y << std::endl;
     }
 
     if (!loop_entered) {
