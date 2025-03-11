@@ -128,7 +128,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
             ledController_.indicate_startup_message();
             close(client_socket);
         } else {
-            handle_client(client_socket);
+            handle_client(client_socket, shutdown_requested);
             // // Fork a new process to handle the client
             // pid_t pid = fork();
             // if (pid == -1) {
@@ -150,12 +150,12 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     close_server();
 }
 
-void TCPServer::handle_client(int client_socket) {
+void TCPServer::handle_client(int client_socket, std::atomic<bool>& shutdown_requested) {
     char buffer[BUFFER_SIZE];
     ssize_t bytes_received;
 
     // Communicate with the client
-    while ((bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0)) > 0) {
+    while ((bytes_received = recv(client_socket, buffer, BUFFER_SIZE - 1, 0)) > 0 && !shutdown_requested.load(std::memory_order_acquire)) {
         buffer[bytes_received] = '\0'; // Null-terminate the received data
         std::cout << "Received: " << buffer << std::endl;
 

@@ -41,7 +41,7 @@ private:
     SharedMemory* shared_memory_;
     sem_t* semaphore_;
 
-    void handle_client(int clientSocket);
+    void handle_client(int clientSocket, std::atomic<bool>& shutdown_requested);
     void close_server();
 };
 
