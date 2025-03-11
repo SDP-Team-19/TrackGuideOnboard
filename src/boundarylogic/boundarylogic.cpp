@@ -71,6 +71,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     while (std::getline(file, line)) {
         std::istringstream ss(line);
         std::string lat_str, lon_str;
+        std::cout << "Reading line: " << line << std::endl;
         if (std::getline(ss, lat_str, ',') && std::getline(ss, lon_str, ',')) {
             std::cout << "Read Latitude: " << lat_str << ", Longitude: " << lon_str << std::endl;
             double latitude = std::stof(lat_str);
