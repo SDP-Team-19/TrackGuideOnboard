@@ -135,6 +135,11 @@ void BoundaryLogic::load_track(const std::string& file_path) {
 }
 
 double BoundaryLogic::computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next) {
+    // Constants for conversion
+    const double earthRadiusKm = 6371.0;
+    const double metersPerKm = 1000.0;
+    const double cmPerMeter = 100.0;
+
     // 1. Compute the heading vector (direction of the track at this point)
     double dx = next.x - closest.x;
     double dy = next.y - closest.y;
@@ -154,6 +159,16 @@ double BoundaryLogic::computeSignedPerpendicularDistance(const Point2D& userPos,
 
     // 4. Compute the signed perpendicular distance (dot product with normal)
     double signedPerpDist = (diffX * normX + diffY * normY);
+
+    // Convert latitude/longitude degrees to radians
+    double lat1Rad = closest.x * M_PI / 180.0;
+    double lat2Rad = userPos.x * M_PI / 180.0;
+
+    // Convert the signed perpendicular distance from degrees to kilometers
+    signedPerpDist *= (M_PI / 180.0) * earthRadiusKm * cos((lat1Rad + lat2Rad) / 2.0);
+
+    // Convert kilometers to centimeters
+    signedPerpDist *= metersPerKm * cmPerMeter;
 
     return signedPerpDist;
 }
