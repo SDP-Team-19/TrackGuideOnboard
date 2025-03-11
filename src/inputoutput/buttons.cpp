@@ -9,6 +9,7 @@
 #include <sys/stat.h>   // For mode constants
 #include <semaphore.h>  // For semaphores
 #include <tcpserver.h>
+#include "semaphoreguard.h"
 
 Buttons::Buttons(uint8_t recordPin, uint8_t resetPin, uint8_t playPin, SharedMemory* shared_memory, sem_t* semaphore)
     : recordPin_(recordPin), resetPin_(resetPin), playPin_(playPin), shared_memory_(shared_memory), semaphore_(semaphore) {
@@ -38,7 +39,10 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
         playState = get_button_state(playPin_);
 
         // Lock the semaphore to access shared memory
-        sem_wait(semaphore_);
+        SemaphoreGuard semaphore_guard(semaphore_);
+        if (!semaphore_guard.acquired()) {
+            continue;
+        }
         SystemState currentSystemState = shared_memory_->state;
 
         if (recordState == ButtonState::PRESSED && prevRecordButtonState_ == ButtonState::RELEASED) {
@@ -77,7 +81,7 @@ void Buttons::monitor_button(std::atomic<bool>& shutdown_requested) {
         prevPlayButtonState_ = playState;
 
         // Add a small delay to prevent high CPU usage
-        gpioDelay(500000); // 100 milliseconds
+        gpioDelay(100000); // 100 milliseconds
     }
     std::cout << "Button monitoring thread shutting down..." << std::endl;
 }

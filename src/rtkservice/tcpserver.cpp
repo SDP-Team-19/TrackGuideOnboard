@@ -5,6 +5,7 @@
 #include <unistd.h>     // For ftruncate
 #include <sys/stat.h>   // For mode constants
 #include <semaphore.h>  // For semaphores
+#include <semaphoreguard.h>
 
 std::ostream& operator<<(std::ostream& os, const SystemState& state) {
     switch (state) {
@@ -162,8 +163,8 @@ void TCPServer::handle_client(int client_socket) {
         send(client_socket, buffer, bytes_received, 0);
 
         // Acquire the semaphore before accessing shared memory
-        if (sem_wait(semaphore_) == -1) {
-            std::cerr << "sem_wait() failed: " << strerror(errno) << std::endl;
+        SemaphoreGuard semaphore_guard(semaphore_);
+        if (!semaphore_guard.acquired()) {
             close(client_socket);
             return;
         }
