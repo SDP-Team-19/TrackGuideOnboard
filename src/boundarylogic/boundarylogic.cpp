@@ -41,7 +41,14 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
     std::cout << "neighbors found" << std::endl;
 
-    size_t nextIdx = (nearestIdx < _point_cloud_ptr->points.size() - 1) ? nearestIdx + 1 : nearestIdx - 1;
+    size_t nextIdx;
+    if (nearestIdx == 0) {
+        nextIdx = 1;
+    } else if (nearestIdx == _point_cloud_ptr->points.size() - 1) {
+        nextIdx = nearestIdx - 1;
+    } else {
+        nextIdx = nearestIdx + 1;
+    }
     std::cout << "next index found" << std::endl;
 
     std::cout << "computing signed perp distance" << std::endl;

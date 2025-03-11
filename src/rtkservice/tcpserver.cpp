@@ -112,6 +112,14 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 
         std::cout << "Connection received from " << inet_ntoa(client_addr.sin_addr) << std::endl;
 
+        // Set a timeout for the socket
+        struct timeval recv_timeout = {5, 0}; // 5 seconds timeout
+        if (setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, &recv_timeout, sizeof(recv_timeout)) == -1) {
+            std::cerr << "setsockopt() failed: " << strerror(errno) << std::endl;
+            close(client_socket);
+            continue;
+        }
+
         // Read the first byte to check if it starts with '%'
         char initial_byte;
         ssize_t bytes_received = recv(client_socket, &initial_byte, 1, MSG_PEEK);
