@@ -18,6 +18,7 @@ find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 # Create the executable target
 add_executable(main
     src/main.cpp
+    src/states/example.cpp
 )
 
 # Set include directories *only* for this target
