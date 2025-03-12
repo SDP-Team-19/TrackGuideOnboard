@@ -34,14 +34,14 @@ public:
     void indicate_both(Color color);
     void indicate_all(Color color);
     void indicate_startup_message();
-    void update_leds(float distance);
+    void update_leds(double distance);
     void clear();
 
 private:
     uint16_t _stripLength;
     ws2811_t _ledstring;
     ws2811_led_t map_color(Color color);
-    float mapDistanceToRatio(float distance, float minDistance, float maxDistance);
+    float mapDistanceToRatio(double distance, double minDistance, double maxDistance);
     ColorChannels interpolateColor(ColorChannels startColor, ColorChannels endColor, float ratio);
 };
 

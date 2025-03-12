@@ -87,10 +87,10 @@ void LEDControl::indicate_startup_message() {
     }
 }
 
-void LEDControl::update_leds(float distance) {
+void LEDControl::update_leds(double distance) {
     // Define minimum and maximum distances for the gradient
-    float minDistance = 0.0f;
-    float maxDistance = 100.0f;
+    double minDistance = 0.0f;
+    double maxDistance = 100.0f;
     int start = _stripLength-LEFTRIGHTSIZE;
     int end = _stripLength;
 
@@ -136,7 +136,7 @@ ColorChannels LEDControl::interpolateColor(ColorChannels startColor, ColorChanne
     return result;
 }
 
-float LEDControl::mapDistanceToRatio(float distance, float minDistance, float maxDistance) {
+float LEDControl::mapDistanceToRatio(double distance, double minDistance, double maxDistance) {
     if (minDistance == maxDistance) {
         // Handle the case where the range is zero
         return 0.0f; // or an appropriate value or error code
