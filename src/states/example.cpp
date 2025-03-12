@@ -1,4 +1,4 @@
-#include "Example.h"
+#include "example.h"
 
 Example::Example() {
     std::cout << "Example object created!" << std::endl;
