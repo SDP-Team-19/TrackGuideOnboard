@@ -74,6 +74,7 @@ int main() {
     Aws::SDKOptions options;
     Aws::InitAPI(options);
     KinesisClient kinesisClient;
+    std::cout << "initialized client" << std::endl;
 
     KinesisStream kinesisStream("CoordinatesStream", kinesisClient);
 
