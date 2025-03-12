@@ -72,6 +72,7 @@ int main() {
     usleep(3000000);
 
     KinesisStream kinesisStream("CoordinatesStream");
+    std::cout << "Stream setup" << std::endl;
 
     Buttons buttons(16, 20, 21, shared_memory, semaphore, kinesisStream);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
