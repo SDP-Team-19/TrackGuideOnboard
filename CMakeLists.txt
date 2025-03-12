@@ -69,8 +69,6 @@ set(AWSSDK_DIR "~/Desktop/TrackGuide-App-trackguide-map/aws-sdk-install/lib/cmak
 find_library(WS2811_LIBRARY ws2811 REQUIRED)
 find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 
-target_include_directories(YourExecutableName PRIVATE ${PROJECT_SOURCE_DIR}/include)
-
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
 add_executable(main 
@@ -84,6 +82,7 @@ add_executable(main
     src/rtkservice/rtkservice.cpp
     src/rtkservice/tcpserver.cpp
 )
+target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
 target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
