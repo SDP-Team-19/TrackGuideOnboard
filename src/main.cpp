@@ -71,7 +71,11 @@ int main() {
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
 
-    KinesisStream kinesisStream("CoordinatesStream");
+    Aws::SDKOptions options;
+    Aws::InitAPI(options);
+    KinesisClient kinesisClient;
+
+    KinesisStream kinesisStream("CoordinatesStream", kinesisClient);
 
     Buttons buttons(16, 20, 21, shared_memory, semaphore, kinesisStream);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));

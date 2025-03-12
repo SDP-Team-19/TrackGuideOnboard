@@ -1,10 +1,7 @@
 #include "kinesis.h"
 
-KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
-    Aws::InitAPI(options);
-    std::cout << "starting Kinesis Client" << std::endl;
-    kinesisClient = std::make_unique<KinesisClient>();
-    std::cout << "Kinesis Client created" << std::endl;
+KinesisStream::KinesisStream(const std::string& streamName, Aws::Kinesis::KinesisClient& kinesisClient) : streamName(streamName), kinesisClient(kinesisClient) {
+    std::cout << "kinesis stream created" << std::endl;
 }
 
 KinesisStream::~KinesisStream() {
@@ -19,7 +16,7 @@ bool KinesisStream::sendModeData(const std::string& mode, const double threshold
     request.SetPartitionKey(Aws::Utils::UUID::RandomUUID());
     request.SetData(Aws::Utils::ByteBuffer((unsigned char*)payloadStr.c_str(), payloadStr.length()));
 
-    auto outcome = kinesisClient->PutRecord(request);
+    auto outcome = kinesisClient.PutRecord(request);
     if (!outcome.IsSuccess()) {
         std::cerr << "Failed to send mode data to Kinesis: " << outcome.GetError().GetMessage() << std::endl;
         return false;
@@ -36,7 +33,7 @@ bool KinesisStream::sendPositionData(const double latitude, const double longitu
     request.SetPartitionKey(Aws::Utils::UUID::RandomUUID());
     request.SetData(Aws::Utils::ByteBuffer((unsigned char*)payloadStr.c_str(), payloadStr.length()));
 
-    auto outcome = kinesisClient->PutRecord(request);
+    auto outcome = kinesisClient.PutRecord(request);
     if (!outcome.IsSuccess()) {
         std::cerr << "Failed to send position data to Kinesis: " << outcome.GetError().GetMessage() << std::endl;
         return false;

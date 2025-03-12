@@ -18,7 +18,7 @@ using namespace Aws::Kinesis::Model;
 
 class KinesisStream {
 public:
-    KinesisStream(const std::string& streamName);
+    KinesisStream(const std::string& streamName, Aws::Kinesis::KinesisClient& kinesisClient);
     ~KinesisStream();
 
     bool sendModeData(const std::string& mode, const double threshold);
@@ -28,7 +28,7 @@ private:
     JsonValue serializeModeData(const std::string& mode, const double threshold);
     JsonValue serializePositionData(const double latitude, const double longitude);
     Aws::SDKOptions options;
-    std::unique_ptr<Aws::Kinesis::KinesisClient> kinesisClient;
+    Aws::Kinesis::KinesisClient& kinesisClient;
     std::string streamName;
 };;
 
