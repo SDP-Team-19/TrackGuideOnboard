@@ -39,6 +39,10 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     params.sorted = false;
     params.eps = 0.0;
     std::cout << "finding neighbors" << std::endl;
+    if (!_kdtree_ptr)
+    {
+        std::cout << "_kdtree_ptr uninitialized" << std::endl;
+    }
     _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
     std::cout << "neighbors found" << std::endl;
 
@@ -94,9 +98,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
         loop_entered = true;
         std::istringstream ss(line);
         std::string lat_str, lon_str;
-        std::cout << "Reading line: " << line << std::endl;
         if (std::getline(ss, lat_str, ',') && std::getline(ss, lon_str, ',')) {
-            std::cout << "Read Latitude: " << lat_str << ", Longitude: " << lon_str << std::endl;
             double latitude, longitude;
             try {
                 double latitude = std::stod(lat_str);
@@ -111,11 +113,6 @@ void BoundaryLogic::load_track(const std::string& file_path) {
         }
     }
 
-    std::cout << "Printing all points in point_cloud:" << std::endl;
-    for (const auto& point : point_cloud.points) {
-        std::cout << "Latitude: " << point.x << ", Longitude: " << point.y << std::endl;
-    }
-
     if (!loop_entered) {
         std::cout << "No lines read from the file." << std::endl;
     }
@@ -128,9 +125,9 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     }
 
     // Load the KDTree into the private variable kdtree
-    _kdtree_ptr = std::make_unique<KDTree>(2, point_cloud, KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
-    _kdtree_ptr->buildIndex();
     _point_cloud_ptr = std::make_unique<PointCloud>(point_cloud);
+    _kdtree_ptr = std::make_unique<KDTree>(2, *_point_cloud_ptr, KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
+    _kdtree_ptr->buildIndex();
     std::cout << "Track loaded successfully" << std::endl;
 }
 
