@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.20)
 
 project(TrackGuideOnboard)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 # Set paths for RTKLIB
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs)
@@ -16,12 +19,14 @@ find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 include_directories(${INCLUDE_DIR})
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
+find_package(OpenSSL REQUIRED)
 
 # Include directory for tcpserver.h
 include_directories(${CMAKE_SOURCE_DIR}/src/rtkservice)
 include_directories(${CMAKE_SOURCE_DIR}/src/inputoutput)
 include_directories(${CMAKE_SOURCE_DIR}/src/states)
 include_directories(${CMAKE_SOURCE_DIR}/src/boundarylogic)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 # Create executable for main
 add_executable(main src/main.cpp)
