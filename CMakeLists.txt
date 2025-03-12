@@ -66,5 +66,5 @@ set(AWSSDK_DIR "~/Desktop/TrackGuide-App-trackguide-map/aws-sdk-install/lib/cmak
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
-add_executable(main main.cpp)
+add_executable(main src/main.cpp)
 target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
