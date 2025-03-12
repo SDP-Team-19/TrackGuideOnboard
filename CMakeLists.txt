@@ -13,7 +13,6 @@ find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 
 
 # Include RTKLIB headers
-set(AWSSDK_DIR "/home/team19/sdk_build/AWSSDK")
 include_directories(${RTKLIB_INCLUDE_DIR})
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
@@ -55,7 +54,3 @@ target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
 target_link_libraries(main PRIVATE ${OPENSSL_LIBRARIES})
 target_include_directories(main PRIVATE /usr/local/include)
-
-# Include directories for AWS SDK
-
-target_include_directories(main PRIVATE ${AWSSDK_INCLUDE_DIRS})

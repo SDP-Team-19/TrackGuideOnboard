@@ -3,6 +3,8 @@
 KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
     Aws::InitAPI(options); // Initialize the AWS SDK
     std::cout << "starting Kinesis Client" << std::endl;
+    
+    Aws::Client::ClientConfiguration clientConfig;
     kinesisClient = std::make_unique<Aws::Kinesis::KinesisClient>();
     std::cout << "kinesis stream created" << std::endl;
 }
