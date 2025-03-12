@@ -10,6 +10,8 @@ set(RTKLIB_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libs)
 find_library(RTKLIB_LIB rtklib PATHS ${RTKLIB_LIBRARY_DIR})
 find_library(WS2811_LIBRARY ws2811 REQUIRED)
 find_library(PIGPIO_LIBRARY pigpio REQUIRED)
+find_package(AWSSDK REQUIRED COMPONENTS kinesis)
+
 
 # Include RTKLIB headers
 include_directories(${RTKLIB_INCLUDE_DIR})
@@ -48,3 +50,6 @@ target_link_libraries(main PRIVATE kinesis)
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
 target_include_directories(main PRIVATE /usr/local/include)
+
+# Include directories for AWS SDK
+target_include_directories(main PRIVATE ${AWSSDK_INCLUDE_DIRS})
