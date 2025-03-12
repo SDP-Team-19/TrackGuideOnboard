@@ -19,7 +19,6 @@ find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 include_directories(${INCLUDE_DIR})
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
-find_package(OpenSSL REQUIRED)
 
 # Include directory for tcpserver.h
 include_directories(${CMAKE_SOURCE_DIR}/src/rtkservice)
@@ -54,5 +53,4 @@ target_link_libraries(main PRIVATE kinesisStream ${AWSSDK_LINK_LIBRARIES})
 target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
-target_link_libraries(main PRIVATE ${OPENSSL_LIBRARIES})
 # target_include_directories(main PRIVATE /usr/local/include)
