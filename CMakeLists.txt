@@ -27,6 +27,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/inputoutput)
 include_directories(${CMAKE_SOURCE_DIR}/src/states)
 include_directories(${CMAKE_SOURCE_DIR}/src/boundarylogic)
 include_directories(${OPENSSL_INCLUDE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Create executable for main
 add_executable(main src/main.cpp)
@@ -54,4 +55,4 @@ target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
 target_link_libraries(main PRIVATE ${OPENSSL_LIBRARIES})
-target_include_directories(main PRIVATE /usr/local/include)
+# target_include_directories(main PRIVATE /usr/local/include)
