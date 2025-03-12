@@ -4,7 +4,6 @@
 #include <atomic>
 #include <cstdint>
 #include <semaphore.h>
-#include "kinesis.h"
 
 enum class SystemState {
     STANDBY,

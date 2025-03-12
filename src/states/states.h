@@ -2,7 +2,7 @@
 #define STATES_H
 #include "ledcontrol.h"
 #include "boundarylogic.h"
-#include "kinesis.h"
+#include "kinesisStream.h"
 
 class States {
 public:
