@@ -74,13 +74,13 @@ find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 add_executable(main 
     src/main.cpp
     src/inputoutput/ledcontrol.cpp
+    src/rtkservice/tcpserver.cpp
     src/inputoutput/buttons.cpp
     src/inputoutput/semaphoreguard.cpp
     src/inputoutput/kinesisStream.cpp
     src/boundarylogic/boundarylogic.cpp
     src/states/states.cpp
     src/rtkservice/rtkservice.cpp
-    src/rtkservice/tcpserver.cpp
 )
 target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
