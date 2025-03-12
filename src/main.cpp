@@ -139,6 +139,7 @@ using namespace std;
 int first = 0;
 //generate fake coords
 JsonValue generate_coordinates(double latitude, double longitude) {
+    cout << "Generating coords" << endl;
     if(first == 0){
         double threshold = 0.00001;
         Aws:String jsonString = R"({"mode":"replay"})";
@@ -196,6 +197,7 @@ int main() {
     while (true) {
         //convert coords to JSON
          //gen new coordinates
+         cout << "Looping" << endl;
         JsonValue jsonResult = generate_coordinates(latitude, longitude);
         Aws::String jsonString = jsonResult.View().WriteReadable();
 
