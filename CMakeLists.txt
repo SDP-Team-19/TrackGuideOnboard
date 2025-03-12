@@ -14,7 +14,7 @@ find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
 
 # Include RTKLIB headers
-set(CMAKE_PREFIX_PATH "/home/team19/sdk_build")
+set(AWSSDK_DIR "/home/team19/sdk_build/AWSSDK")
 include_directories(${RTKLIB_INCLUDE_DIR})
 
 # Include directory for tcpserver.h
