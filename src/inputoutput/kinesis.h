@@ -6,7 +6,14 @@
 #include <aws/core/Aws.h>
 #include <aws/core/utils/Outcome.h>
 #include <aws/core/utils/UUID.h>
+#include <aws/core/utils/json/JsonSerializer.h>
 #include <string>
+#include <sstream>
+#include <iostream>
+
+using namespace Aws::Utils::Json;
+using namespace Aws::Kinesis;
+using namespace Aws::Kinesis::Model;
 
 class KinesisStream {
 public:

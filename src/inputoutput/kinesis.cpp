@@ -1,15 +1,4 @@
 #include "kinesis.h"
-#include <aws/core/utils/json/JsonSerializer.h>
-#include <aws/core/utils/Outcome.h>
-#include <aws/kinesis/model/PutRecordRequest.h>
-#include <iostream>
-#include <string>
-#include <sstream>
-
-
-using namespace Aws::Utils::Json;
-using namespace Aws::Kinesis;
-using namespace Aws::Kinesis::Model;
 
 KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
     Aws::InitAPI(options);
