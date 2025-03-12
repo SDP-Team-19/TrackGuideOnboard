@@ -62,34 +62,34 @@ void States::run_play_function(const char* content) {
 
     if (!track_loaded_) {
         std::cout << "Loading track from coordinates.csv" << std::endl;
-        boundaryLogic_.load_track("coordinates.csv");
-        track_loaded_ = true;
+        track_loaded_ = boundaryLogic_.load_track("coordinates.csv");
     }
 
     // Calculate the distance
     try {
-        double distance = boundaryLogic_.calculate_distance(latitude, longitude);
-        std::cout << "Distance from track (cm): " << distance << std::endl;
-        if (distance > 0) {
-            if (distance < 100)
-            {
-                ledController_.indicate_right(Color::GREEN);
-            }
-            else
-            {
-                ledController_.indicate_right(Color::RED);
-            }
-        } else {
-            if (distance > -100)
-            {
-                ledController_.indicate_left(Color::GREEN);
-            }
-            else
-            {
-                ledController_.indicate_left(Color::RED);
+        if(track_loaded_){
+            double distance = boundaryLogic_.calculate_distance(latitude, longitude);
+            std::cout << "Distance from track (cm): " << distance << std::endl;
+            if (distance > 0) {
+                if (distance < 100)
+                {
+                    ledController_.indicate_right(Color::GREEN);
+                }
+                else
+                {
+                    ledController_.indicate_right(Color::RED);
+                }
+            } else {
+                if (distance > -100)
+                {
+                    ledController_.indicate_left(Color::GREEN);
+                }
+                else
+                {
+                    ledController_.indicate_left(Color::RED);
+                }
             }
         }
-        
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;
     }
@@ -99,9 +99,8 @@ void States::run_reset_function() {
     std::lock_guard<std::mutex> lock(file_mutex);
     is_recording_ = false;
     if (remove("coordinates.csv") != 0) {
-        std::cerr << "Error deleting coordinates.csv" << std::endl;
+        std::cout << "Could not delete coordinates.csv" << std::endl;
     } else {
         std::cout << "coordinates.csv successfully deleted" << std::endl;
     }
-    std::cout << "Running record function without parameters." << std::endl;
 }

@@ -49,7 +49,7 @@ public:
 
     // Member functions
     double calculate_distance(double latitude, double longitude);
-    void load_track(const std::string& file_path);
+    bool load_track(const std::string& file_path);
 
 private:
     double computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next);

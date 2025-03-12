@@ -72,14 +72,14 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
 }
 
 // Function to load track from a saved CSV file
-void BoundaryLogic::load_track(const std::string& file_path) {
+bool BoundaryLogic::load_track(const std::string& file_path) {
     // std::cout << "Locking mutex for loading track" << std::endl;
     // std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
 
     std::cout << "Loading track from file: " << file_path << std::endl;
     std::ifstream file(file_path);
     if (!file.is_open()) {
-        throw std::runtime_error("Could not open file: " + file_path);
+        std::cout << "Could not open file: " << file_path << std::endl;
     }
 
     std::cout << "Clearning variables" << std::endl;
@@ -129,6 +129,7 @@ void BoundaryLogic::load_track(const std::string& file_path) {
     _kdtree_ptr = std::make_unique<KDTree>(2, *_point_cloud_ptr, KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
     _kdtree_ptr->buildIndex();
     std::cout << "Track loaded successfully" << std::endl;
+    return true;
 }
 
 double BoundaryLogic::computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next) {
