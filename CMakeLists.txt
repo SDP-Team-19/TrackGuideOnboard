@@ -23,6 +23,7 @@ add_executable(main
 
 # Set include directories *only* for this target
 target_include_directories(main PRIVATE
+    ${AWSSDK_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/src/states
 )
 
