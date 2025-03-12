@@ -7,6 +7,7 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs)
 
 # Find libraries
+find_library(RTKLIB_LIB rtklib PATHS ${INCLUDE_DIR})
 find_library(WS2811_LIBRARY ws2811 REQUIRED)
 find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 
@@ -36,8 +37,8 @@ add_library(boundarylogic src/boundarylogic/boundarylogic.cpp)
 add_library(kinesisStream src/inputoutput/kinesisStream.cpp)
 
 # Link macors library to the main executable
-target_link_libraries(main PRIVATE rtkservice)
-target_link_libraries(main PRIVATE tcpserver)
+target_link_libraries(main PRIVATE rtkservice ${RTKLIB_LIB})
+target_link_libraries(main PRIVATE tcpserver ${RTKLIB_LIB})
 target_link_libraries(main PRIVATE ledcontrol ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE buttons ${PIGPIO_LIBRARY})
 target_link_libraries(main PRIVATE states)
