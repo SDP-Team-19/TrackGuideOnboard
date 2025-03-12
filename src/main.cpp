@@ -185,8 +185,9 @@ int main() {
     //JsonValue json(jsonString);
     Aws::SDKOptions options;
     Aws::InitAPI(options);  //init AWS SDK
-
+    cout << "Creating client" << endl;
     KinesisClient kinesisClient;
+    cout << "Client Created" << endl;
 
     string streamName = "CoordinatesStream";
     double latitude = 42.393489;
