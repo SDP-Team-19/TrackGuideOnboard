@@ -4,6 +4,7 @@ KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamN
     Aws::InitAPI(options);
     std::cout << "starting Kinesis Client" << std::endl;
     kinesisClient = std::make_unique<KinesisClient>();
+    std::cout << "Kinesis Client created" << std::endl;
 }
 
 KinesisStream::~KinesisStream() {
