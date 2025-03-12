@@ -87,6 +87,37 @@ void LEDControl::indicate_startup_message() {
     }
 }
 
+void LEDControl::update_leds(float distance) {
+    // Define minimum and maximum distances for the gradient
+    float minDistance = 0.0f;
+    float maxDistance = 100.0f;
+    int start = _stripLength-LEFTRIGHTSIZE;
+    int end = _stripLength;
+
+    // Define start (green) and end (red) colors
+    ColorChannels green = {0, 255, 0};
+    ColorChannels red = {255, 0, 0};
+
+    // Calculate the interpolation ratio
+    float ratio = mapDistanceToRatio(std::fabs(distance), minDistance, maxDistance);
+
+    // Get the interpolated color
+    ColorChannels currentColor = interpolateColor(green, red, ratio);
+
+    // Update the LED strip with the current color
+    if (distance > 0)
+    {
+        start = 0;
+        end = LEFTRIGHTSIZE;
+    }
+    for (int i = start; i < end; i++) {
+        _ledstring.channel[0].leds[i] = (currentColor.r << 16) | (currentColor.g << 8) | currentColor.b;
+    }
+
+    // Render the updated colors to the LED strip
+    ws2811_render(&_ledstring);
+}
+
 void LEDControl::clear() {
     std::cout << "Clearing the LED strip" << std::endl;
 
@@ -95,6 +126,24 @@ void LEDControl::clear() {
     }
 
     ws2811_render(&_ledstring);
+}
+
+ColorChannels LEDControl::interpolateColor(ColorChannels startColor, ColorChannels endColor, float ratio) {
+    ColorChannels result;
+    result.r = startColor.r + ratio * (endColor.r - startColor.r);
+    result.g = startColor.g + ratio * (endColor.g - startColor.g);
+    result.b = startColor.b + ratio * (endColor.b - startColor.b);
+    return result;
+}
+
+float LEDControl::mapDistanceToRatio(float distance, float minDistance, float maxDistance) {
+    if (minDistance == maxDistance) {
+        // Handle the case where the range is zero
+        return 0.0f; // or an appropriate value or error code
+    }
+    if (distance < minDistance) return 0.0f;
+    if (distance > maxDistance) return 1.0f;
+    return (distance - minDistance) / (maxDistance - minDistance);
 }
 
 ws2811_led_t LEDControl::map_color(Color color) {
