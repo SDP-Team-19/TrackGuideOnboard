@@ -2,6 +2,7 @@
 
 KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
     Aws::InitAPI(options);
+    std::cout << "starting Kinesis Client" << std::endl;
     kinesisClient = new KinesisClient();
 }
 
