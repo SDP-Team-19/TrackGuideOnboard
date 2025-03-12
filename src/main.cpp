@@ -233,6 +233,8 @@ int main() {
 
             if (outcome.IsSuccess()) {
                 cout << "Sent: " << jsonStr << endl;
+            }else{
+                cout << "Error: " << outcome.GetError().GetMessage() << endl;
             }
         }
         this_thread::sleep_for(chrono::seconds(1));  // Wait 2 seconds
