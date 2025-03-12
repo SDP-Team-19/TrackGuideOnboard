@@ -4,6 +4,7 @@
 #include "ledcontrol.h"
 #include "buttons.h"
 #include "states.h"
+#include "kinesis.h"
 #include <pigpio.h>
 #include <iostream>
 #include <thread>
@@ -70,11 +71,13 @@ int main() {
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
 
-    Buttons buttons(16, 20, 21, shared_memory, semaphore);
+    KinesisStream kinesisStream("CoordinatesStream");
+
+    Buttons buttons(16, 20, 21, shared_memory, semaphore, kinesisStream);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
     BoundaryLogic boundary_logic;
-    States states(led_control, boundary_logic);
+    States states(led_control, boundary_logic, kinesisStream);
 
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
     rtk_service_ptr = &rtk_service;
