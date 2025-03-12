@@ -18,7 +18,13 @@ find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 # Create the executable target
 add_executable(main
     src/main.cpp
-    src/test.cpp
+    src/states/states.cpp
+    src/boundarylogic/boundarylogic.cpp
+    src/inputoutput/buttons.cpp
+    src/inputoutput/ledcontrol.cpp
+    src/inputoutput/semaphoreguard.cpp
+    src/rtkservice/rtkservice.cpp
+    src/rtkservice/tcpserver.cpp
 )
 
 # Set include directories *only* for this target
