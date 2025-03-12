@@ -1,6 +1,6 @@
 #include "kinesis.h"
 
-KinesisStream::KinesisStream(const std::string& streamName, Aws::Kinesis::KinesisClient& kinesisClient) : streamName(streamName), kinesisClient(kinesisClient) {
+KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
     std::cout << "kinesis stream created" << std::endl;
 }
 
