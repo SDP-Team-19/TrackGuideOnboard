@@ -228,6 +228,7 @@ int main() {
             request.SetPartitionKey("partition-1");
 
             //send data to kinesis
+            cout << "Putting record" << endl;
             auto outcome = kinesisClient.PutRecord(request);
 
 
