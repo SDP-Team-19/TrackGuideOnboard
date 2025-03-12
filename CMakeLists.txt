@@ -36,4 +36,4 @@ set(SOURCES
 add_executable(main ${SOURCES})
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
-target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
+target_link_libraries(main PRIVATE aws-cpp-sdk-kinesis aws-cpp-sdk-core)
