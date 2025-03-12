@@ -71,22 +71,7 @@ find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
-add_executable(main 
-    src/main.cpp
-    src/inputoutput/ledcontrol.cpp
-    src/rtkservice/tcpserver.cpp
-    src/inputoutput/buttons.cpp
-    src/inputoutput/semaphoreguard.cpp
-    src/inputoutput/kinesisStream.cpp
-    src/boundarylogic/boundarylogic.cpp
-    src/states/states.cpp
-    src/rtkservice/rtkservice.cpp
-)
-target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR}/src/inputoutput)
-target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR}/src/rtkservice)
-target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR}/src/boundarylogic)
-target_include_directories(main PRIVATE ${PROJECT_SOURCE_DIR}/src/states)
+add_executable(main src/main.cpp)
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
 target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
