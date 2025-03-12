@@ -1,9 +1,9 @@
 #include "kinesis.h"
 
-KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName), 
-kinesisClient(std::make_unique<KinesisClient>()) {
+KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
     Aws::InitAPI(options);
     std::cout << "starting Kinesis Client" << std::endl;
+    kinesisClient = std::make_unique<KinesisClient>();
 }
 
 KinesisStream::~KinesisStream() {
