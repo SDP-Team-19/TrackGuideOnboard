@@ -12,19 +12,31 @@ find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
-# Add source files
-set(SOURCES
-    ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/states/states.cpp
-    ${CMAKE_SOURCE_DIR}/src/boundarylogic/boundarylogic.cpp
-    ${CMAKE_SOURCE_DIR}/src/inputoutput/buttons.cpp
-    ${CMAKE_SOURCE_DIR}/src/inputoutput/ledcontrol.cpp
-    ${CMAKE_SOURCE_DIR}/src/inputoutput/semaphoreguard.cpp
-    ${CMAKE_SOURCE_DIR}/src/rtkservice/rtkservice.cpp
-    ${CMAKE_SOURCE_DIR}/src/rtkservice/tcpserver.cpp
+# Create the executable target
+add_executable(main
+    src/main.cpp
+    src/states/states.cpp
+    src/boundarylogic/boundarylogic.cpp
+    src/inputoutput/buttons.cpp
+    src/inputoutput/ledcontrol.cpp
+    src/inputoutput/semaphoreguard.cpp
+    src/rtkservice/rtkservice.cpp
+    src/rtkservice/tcpserver.cpp
 )
 
-add_executable(main ${SOURCES})
-target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
-target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
-target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
+# Set include directories *only* for this target
+target_include_directories(main PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/states
+    ${CMAKE_SOURCE_DIR}/src/boundarylogic
+    ${CMAKE_SOURCE_DIR}/src/inputoutput
+    ${CMAKE_SOURCE_DIR}/src/rtkservice
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+# Link required libraries
+target_link_libraries(main PRIVATE
+    ${WS2811_LIBRARY}
+    ${PIGPIO_LIBRARY}
+    aws-cpp-sdk-kinesis
+    aws-cpp-sdk-core
+)
