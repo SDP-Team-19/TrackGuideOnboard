@@ -41,7 +41,10 @@ int main() {
     std::signal(SIGTERM, signal_handler);
     std::signal(SIGCHLD, signal_handler);
 
-    KinesisStream kinesisStream("CoordinatesStream");
+    Aws::SDKOptions options;
+    Aws::InitAPI(options);  //init AWS SDK
+
+    KinesisClient kinesisClient;
     std::cout << "Stream setup" << std::endl;
 
     gpioCfgSetInternals(1 << 10);
@@ -74,10 +77,11 @@ int main() {
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
 
-    Buttons buttons(16, 20, 21, shared_memory, semaphore, kinesisStream);
+    Buttons buttons(16, 20, 21, shared_memory, semaphore);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
     BoundaryLogic boundary_logic;
+    KinesisStream kinesisStream("");
     States states(led_control, boundary_logic, kinesisStream);
 
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
