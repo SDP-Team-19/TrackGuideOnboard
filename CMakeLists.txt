@@ -64,7 +64,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Manually specify AWS SDK installation path
 set(AWSSDK_DIR "~/Desktop/TrackGuide-App-trackguide-map/aws-sdk-install/lib/cmake/AWSSDK")
 
+find_library(WS2811_LIBRARY ws2811 REQUIRED)
+find_library(PIGPIO_LIBRARY pigpio REQUIRED)
+
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
 add_executable(main src/main.cpp)
+target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
+target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
 target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
