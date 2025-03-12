@@ -10,12 +10,13 @@ set(RTKLIB_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libs)
 find_library(RTKLIB_LIB rtklib PATHS ${RTKLIB_LIBRARY_DIR})
 find_library(WS2811_LIBRARY ws2811 REQUIRED)
 find_library(PIGPIO_LIBRARY pigpio REQUIRED)
-find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
 
 # Include RTKLIB headers
 set(AWSSDK_DIR "/home/team19/sdk_build/AWSSDK")
 include_directories(${RTKLIB_INCLUDE_DIR})
+
+find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
 # Include directory for tcpserver.h
 include_directories(${CMAKE_SOURCE_DIR}/src/rtkservice)
