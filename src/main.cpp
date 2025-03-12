@@ -7,6 +7,8 @@
 #include "kinesis.h"
 #include <pigpio.h>
 #include <iostream>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include <thread>
 #include <sys/mman.h>   // For shm_open, mmap, etc.
 #include <fcntl.h>      // For O_* constants
@@ -70,6 +72,11 @@ int main() {
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
+    
+    SSL_load_error_strings();
+    ERR_load_BIO_strings();
+    OpenSSL_add_all_algorithms();
+    OpenSSL_add_all_digests();
 
     KinesisStream kinesisStream("CoordinatesStream");
     std::cout << "Stream setup" << std::endl;

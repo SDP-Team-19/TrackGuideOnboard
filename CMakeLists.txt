@@ -17,12 +17,14 @@ set(AWSSDK_DIR "/home/team19/sdk_build/AWSSDK")
 include_directories(${RTKLIB_INCLUDE_DIR})
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
+find_package(OpenSSL REQUIRED)
 
 # Include directory for tcpserver.h
 include_directories(${CMAKE_SOURCE_DIR}/src/rtkservice)
 include_directories(${CMAKE_SOURCE_DIR}/src/inputoutput)
 include_directories(${CMAKE_SOURCE_DIR}/src/states)
 include_directories(${CMAKE_SOURCE_DIR}/src/boundarylogic)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
 # Create executable for main
 add_executable(main src/main.cpp)
@@ -51,7 +53,9 @@ target_link_libraries(main PRIVATE boundarylogic)
 target_link_libraries(main PRIVATE kinesis ${AWSSDK_LINK_LIBRARIES})
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
+target_link_libraries(main ${OPENSSL_LIBRARIES})
 target_include_directories(main PRIVATE /usr/local/include)
 
 # Include directories for AWS SDK
+
 target_include_directories(main PRIVATE ${AWSSDK_INCLUDE_DIRS})
