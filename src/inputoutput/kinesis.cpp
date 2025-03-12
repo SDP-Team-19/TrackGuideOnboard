@@ -1,13 +1,12 @@
 #include "kinesis.h"
 
-KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
+KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName), 
+kinesisClient(std::make_unique<KinesisClient>()) {
     Aws::InitAPI(options);
     std::cout << "starting Kinesis Client" << std::endl;
-    kinesisClient = new KinesisClient();
 }
 
 KinesisStream::~KinesisStream() {
-    delete kinesisClient;
     Aws::ShutdownAPI(options);
 }
 bool KinesisStream::sendModeData(const std::string& mode, const double threshold) {
