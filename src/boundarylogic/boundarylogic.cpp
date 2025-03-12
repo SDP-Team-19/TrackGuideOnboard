@@ -121,7 +121,7 @@ bool BoundaryLogic::load_track(const std::string& file_path) {
 
     if (point_cloud.points.empty()) {
         std::cerr << "Point cloud is empty. Cannot build KD-Tree." << std::endl;
-        return;
+        return false;
     }
 
     // Load the KDTree into the private variable kdtree
