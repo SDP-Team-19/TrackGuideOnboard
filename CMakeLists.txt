@@ -10,6 +10,7 @@ include_directories(
     src/boundarylogic
     src/inputoutput
     src/rtkservice
+    /include
 )
 
 # Manually specify AWS SDK installation path
