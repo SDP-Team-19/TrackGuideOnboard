@@ -53,7 +53,7 @@ target_link_libraries(main PRIVATE boundarylogic)
 target_link_libraries(main PRIVATE kinesis ${AWSSDK_LINK_LIBRARIES})
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
-target_link_libraries(main ${OPENSSL_LIBRARIES})
+target_link_libraries(main PRIVATE ${OPENSSL_LIBRARIES})
 target_include_directories(main PRIVATE /usr/local/include)
 
 # Include directories for AWS SDK
