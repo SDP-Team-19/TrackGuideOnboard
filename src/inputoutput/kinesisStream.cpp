@@ -1,4 +1,4 @@
-#include "kinesis.h"
+#include "kinesisStream.h"
 
 KinesisStream::KinesisStream(const std::string& streamName) : streamName(streamName) {
     Aws::InitAPI(options); // Initialize the AWS SDK
