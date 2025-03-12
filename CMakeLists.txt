@@ -3,27 +3,24 @@ cmake_minimum_required(VERSION 3.20)
 project(TrackGuideOnboard)
 
 # Set paths for RTKLIB
-set(RTKLIB_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-set(RTKLIB_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libs)
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/libs)
 
 # Find libraries
-find_library(RTKLIB_LIB rtklib PATHS ${RTKLIB_LIBRARY_DIR})
 find_library(WS2811_LIBRARY ws2811 REQUIRED)
 find_library(PIGPIO_LIBRARY pigpio REQUIRED)
 
 
 # Include RTKLIB headers
-include_directories(${RTKLIB_INCLUDE_DIR})
+include_directories(${INCLUDE_DIR})
 
 find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
-find_package(OpenSSL REQUIRED)
 
 # Include directory for tcpserver.h
 include_directories(${CMAKE_SOURCE_DIR}/src/rtkservice)
 include_directories(${CMAKE_SOURCE_DIR}/src/inputoutput)
 include_directories(${CMAKE_SOURCE_DIR}/src/states)
 include_directories(${CMAKE_SOURCE_DIR}/src/boundarylogic)
-include_directories(${OPENSSL_INCLUDE_DIR})
 
 # Create executable for main
 add_executable(main src/main.cpp)
@@ -36,20 +33,17 @@ add_library(buttons src/inputoutput/buttons.cpp)
 add_library(semaphoreguard src/inputoutput/semaphoreguard.cpp)
 add_library(states src/states/states.cpp)
 add_library(boundarylogic src/boundarylogic/boundarylogic.cpp)
-add_library(kinesis src/inputoutput/kinesis.cpp)
-
-# Find CURL package
-find_package(CURL REQUIRED)
+add_library(kinesisStream src/inputoutput/kinesisStream.cpp)
 
 # Link macors library to the main executable
-target_link_libraries(main PRIVATE rtkservice ${RTKLIB_LIB} ${CURL_LIBRARIES})
-target_link_libraries(main PRIVATE tcpserver ${RTKLIB_LIB} ${CURL_LIBRARIES})
+target_link_libraries(main PRIVATE rtkservice)
+target_link_libraries(main PRIVATE tcpserver)
 target_link_libraries(main PRIVATE ledcontrol ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE buttons ${PIGPIO_LIBRARY})
 target_link_libraries(main PRIVATE states)
 target_link_libraries(main PRIVATE semaphoreguard)
 target_link_libraries(main PRIVATE boundarylogic)
-target_link_libraries(main PRIVATE kinesis ${AWSSDK_LINK_LIBRARIES})
+target_link_libraries(main PRIVATE kinesisStream ${AWSSDK_LINK_LIBRARIES})
 target_link_libraries(main PRIVATE ${AWSSDK_LINK_LIBRARIES})
 target_link_libraries(main PRIVATE ${WS2811_LIBRARY})
 target_link_libraries(main PRIVATE ${PIGPIO_LIBRARY})
