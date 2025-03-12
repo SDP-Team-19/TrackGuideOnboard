@@ -10,7 +10,7 @@ include_directories(
     src/boundarylogic
     src/inputoutput
     src/rtkservice
-    /include
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 # Manually specify AWS SDK installation path
