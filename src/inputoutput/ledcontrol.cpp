@@ -87,6 +87,18 @@ void LEDControl::indicate_startup_message() {
     }
 }
 
+void LEDControl::indicate_record_startup() {
+    std::cout << "Indicating startup message" << std::endl;
+
+    for (int i = 0; i < 3; ++i) {
+        indicate_all(Color::RED);
+        usleep(250000);
+        indicate_all(Color::OFF);
+        usleep(250000);
+    }
+    indicate_all(Color::RED);
+}
+
 void LEDControl::update_leds(double distance) {
     // Define minimum and maximum distances for the gradient
     double minDistance = 0.0f;

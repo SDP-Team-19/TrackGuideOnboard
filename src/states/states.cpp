@@ -6,7 +6,7 @@
 #include <mutex>
 
 States::States(LEDControl ledController, BoundaryLogic& boundaryLogic)
-    : ledController_(ledController), boundaryLogic_(boundaryLogic), track_loaded_(false) {
+    : ledController_(ledController), boundaryLogic_(boundaryLogic), track_loaded_(false), is_recording_(false) {
 }
 
 void States::run_record_function(const char* content) {
@@ -16,6 +16,12 @@ void States::run_record_function(const char* content) {
 
     // Example content received
     // Extract the latitude and longitude values
+    if (!is_recording_)
+    {
+        ledController_.indicate_record_startup();
+        is_recording_ = true;
+    }
+
     std::istringstream iss(content);
     std::string date, time;
     double latitude, longitude;
@@ -46,6 +52,7 @@ void States::run_record_function(const char* content) {
 
 void States::run_play_function(const char* content) {
     // Extract the latitude and longitude values
+    is_recording_ = false;
     std::istringstream iss(content);
     std::string date, time;
     double latitude, longitude;
@@ -72,6 +79,7 @@ void States::run_play_function(const char* content) {
 
 void States::run_reset_function() {
     std::lock_guard<std::mutex> lock(file_mutex);
+    is_recording_ = false;
     if (remove("coordinates.csv") != 0) {
         std::cerr << "Error deleting coordinates.csv" << std::endl;
     } else {

@@ -181,6 +181,9 @@ void TCPServer::handle_client(int client_socket, std::atomic<bool>& shutdown_req
             std::cout << "Resetting" << std::endl;
             shared_memory_->state = SystemState::STANDBY;
             states_.run_reset_function();
+        } else if (shared_memory_->state == SystemState::STANDBY)
+        {
+            ledController_.clear();
         }
 
         // Release the semaphore after accessing shared memory

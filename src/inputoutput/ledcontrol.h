@@ -34,6 +34,7 @@ public:
     void indicate_both(Color color);
     void indicate_all(Color color);
     void indicate_startup_message();
+    void indicate_record_startup();
     void update_leds(double distance);
     void clear();
 

@@ -15,6 +15,7 @@ private:
     LEDControl ledController_;
     BoundaryLogic& boundaryLogic_;
     bool track_loaded_;  // Flag to indicate whether the track has been loaded
+    bool is_recording_;
     std::mutex file_mutex;
 };
 
