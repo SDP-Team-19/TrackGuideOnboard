@@ -111,7 +111,7 @@ void LEDControl::update_leds(double distance) {
         end = LEFTRIGHTSIZE;
     }
     if (start >= 0 && start < _stripLength && end >= 0 && end <= _stripLength) {
-        for (int i = start; i < end; i++) {
+        for (int i = start; i < end; ++i) {
             _ledstring.channel[0].leds[i] = (currentColor.r << 16) | (currentColor.g << 8) | currentColor.b;
         }
     } else {
