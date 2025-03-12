@@ -28,7 +28,7 @@ private:
     JsonValue serializeModeData(const std::string& mode, const double threshold);
     JsonValue serializePositionData(const double latitude, const double longitude);
     Aws::SDKOptions options;
-    Aws::Kinesis::KinesisClient kinesisClient;
+    std::unique_ptr<Aws::Kinesis::KinesisClient> kinesisClient;
     std::string streamName;
 };;
 
