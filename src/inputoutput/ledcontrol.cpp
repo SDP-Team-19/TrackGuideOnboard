@@ -110,8 +110,12 @@ void LEDControl::update_leds(double distance) {
         start = 0;
         end = LEFTRIGHTSIZE;
     }
-    for (int i = start; i < end; i++) {
-        _ledstring.channel[0].leds[i] = (currentColor.r << 16) | (currentColor.g << 8) | currentColor.b;
+    if (start >= 0 && start < _stripLength && end >= 0 && end <= _stripLength) {
+        for (int i = start; i < end; i++) {
+            _ledstring.channel[0].leds[i] = (currentColor.r << 16) | (currentColor.g << 8) | currentColor.b;
+        }
+    } else {
+        std::cerr << "Error: Invalid range: start = " << start << ", end = " << end << ", strip length = " << _stripLength << std::endl;
     }
 
     // Render the updated colors to the LED strip
