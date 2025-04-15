@@ -112,8 +112,8 @@ int main() {
     while (!shutdown_requested.load(std::memory_order_acquire)) {
         nlohmann::json location_request = api_client.createLocationRequest(37.7749, -122.4194);
         nlohmann::json mode_request = api_client.createModeRequest(0.5, "test_mode");
-        nlohmann::json location_response = api_client.sendPostRequest("frontend-computer:8081", location_request);
-        nlohmann::json mode_response = api_client.sendPostRequest("frontend-computer:8081", mode_request);
+        nlohmann::json location_response = api_client.sendPostRequest("http://frontend-computer:8081", location_request);
+        nlohmann::json mode_response = api_client.sendPostRequest("http://frontend-computer:8081", mode_request);
         std::cout << "Location Response: " << location_response.dump(4) << std::endl;
         std::cout << "Mode Response: " << mode_response.dump(4) << std::endl;
 
