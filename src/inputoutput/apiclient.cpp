@@ -56,8 +56,6 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
         std::cerr << "CURL error: " << curl_easy_strerror(response) << std::endl;
     }
 
-    parser(responseString);
-
     curl_slist_free_all(headers); // Free the headers list
 
     return responseString;
@@ -68,21 +66,4 @@ size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::
     size_t totalSize = size * nmemb;
     userp->append((char*)contents, totalSize);
     return totalSize;
-}
-
-void ApiClient::parser(std::string input)   {
-    std::cout << "Parsing JSON response: " << input << std::endl;
-    auto json = nlohmann::json::parse(input);
-    std::string type = json["type"];
-    if (type == "location") {
-        float latitude = json["data"]["latitude"];
-        float longitude = json["data"]["longitude"];
-        std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << std::endl;
-    } else if (type == "mode") {
-        float threshold = json["data"]["threshold"];
-        std::string mode = json["data"]["mode"];
-        std::cout << "Threshold: " << threshold << ", Mode: " << mode << std::endl;
-    } else {
-        std::cerr << "Unknown type: " << type << std::endl;
-    }
 }
