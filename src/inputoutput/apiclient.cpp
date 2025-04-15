@@ -62,6 +62,7 @@ size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::
 }
 
 void ApiClient::parser(std::string input)   {
+    cout << "Parsing JSON response: " << input << std::endl;
     auto json = nlohmann::json::parse(input);
     std::string type = json["type"];
     if (type == "location") {
