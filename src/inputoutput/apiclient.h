@@ -22,11 +22,15 @@ public:
     nlohmann::json createModeRequest(float threshold, const std::string& mode);
 
     // Send a JSON request to the server and return the response
-    std::string sendPostRequest(const std::string& url, const nlohmann::json& requestBody);
+    std::string sendPostRequest(const nlohmann::json& requestBody);
 
 private:
 
     CURL* curlHandle;
+
+    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp);
+
+    void parser(std::string input);
 
 };
 

@@ -1,11 +1,9 @@
 #include "apiclient.h"
-#include <stdexcept>
-#include <string>
 #include <nlohmann/json.hpp>
-#include <curl/curl.h>
 
 // Constructor
 ApiClient::ApiClient() {
+    // Initialize CURL
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curlHandle = curl_easy_init();
     if (!curlHandle) {
@@ -40,32 +38,42 @@ nlohmann::json ApiClient::createModeRequest(float threshold, const std::string& 
 }
 
 // Send a POST request with JSON data
-std::string ApiClient::sendPostRequest(const std::string& url, const nlohmann::json& jsonData) {
-    if (!curlHandle) {
-        throw std::runtime_error("CURL handle is not initialized");
-    }
-
-    std::string response;
-    struct curl_slist* headers = nullptr;
+std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
+    std::string responseString;
+    curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");
+    curl_easy_setopt(curlHandle, CURLOPT_DEFAULT_PROTOCOL, "http");
+    struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/json");
-
-    curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, [](void* contents, size_t size, size_t nmemb, void* userp) -> size_t {
-        if (userp) {
-            static_cast<std::string*>(userp)->append(static_cast<char*>(contents), size * nmemb);
-            return size * nmemb;
-        }
-        return 0;
-    });
-    curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseString);
+    CURLcode response;
+    response = curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonData.dump().c_str());
 
-    CURLcode res = curl_easy_perform(curlHandle);
-    curl_slist_free_all(headers);
-
-    if (res != CURLE_OK) {
-        throw std::runtime_error("CURL request failed: " + std::string(curl_easy_strerror(res)));
-    }
+    parser(responseString);
 
     return response;
+}
+
+static size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
+    size_t totalSize = size * nmemb;
+    userp->append((char*)contents, totalSize);
+    return totalSize;
+}
+
+void ApiClient::parser(std::string input)   {
+    auto json = nlohmann::json::parse(input);
+    std::string type = json["type"];
+    if (type == "location") {
+        float latitude = json["data"]["latitude"];
+        float longitude = json["data"]["longitude"];
+        std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << std::endl;
+    } else if (type == "mode") {
+        float threshold = json["data"]["threshold"];
+        std::string mode = json["data"]["mode"];
+        std::cout << "Threshold: " << threshold << ", Mode: " << mode << std::endl;
+    } else {
+        std::cerr << "Unknown type: " << type << std::endl;
+    }
 }
