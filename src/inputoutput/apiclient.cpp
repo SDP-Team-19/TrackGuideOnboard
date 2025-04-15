@@ -53,7 +53,7 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
 
     parser(responseString);
 
-    return response;
+    return responseString;
 }
 
 static size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {

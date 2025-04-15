@@ -114,7 +114,7 @@ int main() {
         nlohmann::json mode_request = api_client.createModeRequest(0.5, "test_mode");
         nlohmann::json location_response = api_client.sendPostRequest(location_request);
         // nlohmann::json mode_response = api_client.sendPostRequest("frontend-computer:8081", mode_request);
-        std::cout << "Location Response: " << location_response.dump(4) << std::endl;
+        // std::cout << "Location Response: " << location_response.dump(4) << std::endl;
         // std::cout << "Mode Response: " << mode_response.dump(4) << std::endl;
 
         std::this_thread::sleep_for(std::chrono::seconds(3));
