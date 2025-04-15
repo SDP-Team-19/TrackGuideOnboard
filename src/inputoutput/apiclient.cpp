@@ -40,7 +40,7 @@ nlohmann::json ApiClient::createModeRequest(float threshold, const std::string& 
 std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     std::string responseString;
     curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");
+    curl_easy_setopt(curlHandle, CURLOPT_URL, "frontend-computer:8081");
     curl_easy_setopt(curlHandle, CURLOPT_DEFAULT_PROTOCOL, "http");
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/json");
