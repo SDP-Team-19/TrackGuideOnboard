@@ -40,7 +40,7 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     std::string responseString;
 
     curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_easy_setopt(curlHandle, CURLOPT_URL, "https://frontend-computer:8081");
+    curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
@@ -50,10 +50,6 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     std::string jsonString = jsonData.dump();
     curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
 
-    // Handle SSL with proper verification
-    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYPEER, 1L);
-    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYHOST, 2L);
-    curl_easy_setopt(curlHandle, CURLOPT_CAINFO, "/etc/ssl/certs/ca-certificates.crt");
 
     CURLcode response = curl_easy_perform(curlHandle);
     if (response != CURLE_OK) {
