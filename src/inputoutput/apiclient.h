@@ -2,6 +2,9 @@
 #define API_H
 
 #include <string>
+#include <curl/curl.h>
+#include <stdexcept>
+#include <sstream>
 #include <nlohmann/json.hpp> // Include the JSON library (https://github.com/nlohmann/json)
 
 class ApiClient {

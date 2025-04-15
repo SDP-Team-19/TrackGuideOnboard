@@ -1,17 +1,20 @@
 #include "apiclient.h"
 
 // Constructor
-ApiClient::ApiClient() : httpClient(std::make_shared<HttpClient>()) {
-    if (!httpClient->connect("frontend-computer", 80)) {
-        throw std::runtime_error("Failed to connect to HTTP client");
+ApiClient::ApiClient() {
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curlHandle = curl_easy_init();
+    if (!curlHandle) {
+        throw std::runtime_error("Failed to initialize CURL");
     }
 }
 
 // Destructor
 ApiClient::~ApiClient() {
-    if (httpClient) {
-        httpClient->disconnect(); // Ensure the client is properly closed
+    if (curlHandle) {
+        curl_easy_cleanup(curlHandle);
     }
+    curl_global_cleanup();
 }
 
 // Create a JSON request with latitude and longitude
@@ -30,4 +33,36 @@ nlohmann::json ApiClient::createModeRequest(float threshold, const std::string& 
     request["data"]["threshold"] = threshold;
     request["data"]["mode"] = mode;
     return request;
+}
+
+// Send a POST request with JSON data
+std::string ApiClient::sendPostRequest(const std::string& url, const nlohmann::json& jsonData) {
+    if (!curlHandle) {
+        throw std::runtime_error("CURL handle is not initialized");
+    }
+
+    std::string response;
+    struct curl_slist* headers = nullptr;
+    headers = curl_slist_append(headers, "Content-Type: application/json");
+
+    curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
+
+    std::string jsonString = jsonData.dump();
+    curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
+
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, [](void* contents, size_t size, size_t nmemb, std::string* userp) -> size_t {
+        userp->append(static_cast<char*>(contents), size * nmemb);
+        return size * nmemb;
+    });
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &response);
+
+    CURLcode res = curl_easy_perform(curlHandle);
+    curl_slist_free_all(headers);
+
+    if (res != CURLE_OK) {
+        throw std::runtime_error("CURL request failed: " + std::string(curl_easy_strerror(res)));
+    }
+
+    return response;
 }
