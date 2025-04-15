@@ -1,5 +1,4 @@
 #include "apiclient.h"
-#include <nlohmann/json.hpp>
 
 // Constructor
 ApiClient::ApiClient() {
@@ -56,7 +55,7 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     return responseString;
 }
 
-static size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
+size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
     size_t totalSize = size * nmemb;
     userp->append((char*)contents, totalSize);
     return totalSize;
