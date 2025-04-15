@@ -36,24 +36,34 @@ nlohmann::json ApiClient::createModeRequest(float threshold, const std::string& 
     return request;
 }
 
-// Send a POST request with JSON data
 std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     std::string responseString;
+
     curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_easy_setopt(curlHandle, CURLOPT_URL, "frontend-computer:8081");
-    curl_easy_setopt(curlHandle, CURLOPT_DEFAULT_PROTOCOL, "http");
+    curl_easy_setopt(curlHandle, CURLOPT_URL, "https://frontend-computer:8081");
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseString);
-    CURLcode response;
-    response = curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonData.dump().c_str());
+    curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonData.dump().c_str());
+
+    // Handle SSL (disable verification for testing purposes)
+    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYPEER, 0L);
+    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYHOST, 0L);
+
+    CURLcode response = curl_easy_perform(curlHandle);
+    if (response != CURLE_OK) {
+        std::cerr << "CURL error: " << curl_easy_strerror(response) << std::endl;
+    }
+
+    curl_slist_free_all(headers); // Free the headers list
 
     parser(responseString);
 
     return responseString;
 }
+
 
 size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
     size_t totalSize = size * nmemb;
