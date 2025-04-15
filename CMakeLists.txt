@@ -46,4 +46,5 @@ target_link_libraries(main PRIVATE
     ${WS2811_LIBRARY}
     ${PIGPIO_LIBRARY}
     nlohmann_json::nlohmann_json
+    curl
 )
