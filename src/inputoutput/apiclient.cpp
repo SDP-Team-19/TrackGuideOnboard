@@ -58,10 +58,6 @@ std::string ApiClient::sendPostRequest(const std::string& url, const nlohmann::j
         }
         return 0;
     });
-    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, [](void* contents, size_t size, size_t nmemb, std::string* userp) -> size_t {
-        userp->append(static_cast<char*>(contents), size * nmemb);
-        return size * nmemb;
-    });
     curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &response);
 
     CURLcode res = curl_easy_perform(curlHandle);
