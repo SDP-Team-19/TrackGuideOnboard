@@ -1,4 +1,8 @@
 #include "apiclient.h"
+#include <stdexcept>
+#include <string>
+#include <nlohmann/json.hpp>
+#include <curl/curl.h>
 
 // Constructor
 ApiClient::ApiClient() {
@@ -47,10 +51,13 @@ std::string ApiClient::sendPostRequest(const std::string& url, const nlohmann::j
 
     curl_easy_setopt(curlHandle, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
-
-    std::string jsonString = jsonData.dump();
-    curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
-
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, [](void* contents, size_t size, size_t nmemb, void* userp) -> size_t {
+        if (userp) {
+            static_cast<std::string*>(userp)->append(static_cast<char*>(contents), size * nmemb);
+            return size * nmemb;
+        }
+        return 0;
+    });
     curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, [](void* contents, size_t size, size_t nmemb, std::string* userp) -> size_t {
         userp->append(static_cast<char*>(contents), size * nmemb);
         return size * nmemb;
