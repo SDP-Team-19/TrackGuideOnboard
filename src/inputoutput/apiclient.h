@@ -22,7 +22,7 @@ public:
     nlohmann::json createModeRequest(float threshold, const std::string& mode);
 
     // Send a JSON request to the server and return the response
-    nlohmann::json sendPostRequest(const std::string& url, const nlohmann::json& requestBody);
+    std::string sendPostRequest(const std::string& url, const nlohmann::json& requestBody);
 
 private:
 
