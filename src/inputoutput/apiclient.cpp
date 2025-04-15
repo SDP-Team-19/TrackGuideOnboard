@@ -46,7 +46,9 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseString);
-    curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonData.dump().c_str());
+    
+    std::string jsonString = jsonData.dump();
+    curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
 
     // Handle SSL with proper verification
     curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYPEER, 1L);
