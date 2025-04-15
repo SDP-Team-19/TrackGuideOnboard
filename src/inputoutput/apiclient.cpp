@@ -48,9 +48,10 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseString);
     curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonData.dump().c_str());
 
-    // Handle SSL (disable verification for testing purposes)
-    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYPEER, 0L);
-    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYHOST, 0L);
+    // Handle SSL with proper verification
+    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYPEER, 1L);
+    curl_easy_setopt(curlHandle, CURLOPT_SSL_VERIFYHOST, 2L);
+    curl_easy_setopt(curlHandle, CURLOPT_CAINFO, "/etc/ssl/certs/ca-certificates.crt");
 
     CURLcode response = curl_easy_perform(curlHandle);
     if (response != CURLE_OK) {
