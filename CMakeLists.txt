@@ -12,6 +12,8 @@ set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fsanitize=address")
 
 find_library(WS2811_LIBRARY ws2811 REQUIRED)
 find_library(PIGPIO_LIBRARY pigpio REQUIRED)
+# Find nlohmann_json
+find_package(nlohmann_json 3.11.2 REQUIRED)
 
 # find_package(AWSSDK REQUIRED COMPONENTS kinesis core)
 
@@ -25,9 +27,11 @@ add_executable(main
     src/inputoutput/semaphoreguard.cpp
     src/rtkservice/rtkservice.cpp
     src/rtkservice/tcpserver.cpp
+    src/inputoutput/apiclient.cpp
 )
 
 # Set include directories *only* for this target
+
 target_include_directories(main PRIVATE
     ${AWSSDK_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}/src/states
@@ -41,4 +45,5 @@ target_include_directories(main PRIVATE
 target_link_libraries(main PRIVATE
     ${WS2811_LIBRARY}
     ${PIGPIO_LIBRARY}
+    nlohmann_json::nlohmann_json
 )

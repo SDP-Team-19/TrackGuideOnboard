@@ -12,6 +12,7 @@
 #include <unistd.h>     // For ftruncate
 #include <sys/stat.h>   // For mode constants
 #include <semaphore.h>  // For semaphores
+#include <apiclient.h>
 
 #define PORT 12345
 #define SHM_NAME "/tcpserver_shm"
@@ -36,76 +37,88 @@ void signal_handler(int signal) {
 }
 
 int main() {
-    std::signal(SIGINT, signal_handler);
-    std::signal(SIGTERM, signal_handler);
-    std::signal(SIGCHLD, signal_handler);
+    // std::signal(SIGINT, signal_handler);
+    // std::signal(SIGTERM, signal_handler);
+    // std::signal(SIGCHLD, signal_handler);
 
-    gpioCfgSetInternals(1 << 10);
+    // gpioCfgSetInternals(1 << 10);
 
-    // Create shared memory
-    int shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
-    if (shm_fd == -1) {
-        std::cerr << "Failed to create shared memory: " << strerror(errno) << std::endl;
-        return EXIT_FAILURE;
-    }
-    if (ftruncate(shm_fd, SHM_SIZE) == -1) {
-        std::cerr << "Failed to set size of shared memory: " << strerror(errno) << std::endl;
-        return EXIT_FAILURE;
-    }
-    SharedMemory* shared_memory = static_cast<SharedMemory*>(mmap(nullptr, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
-    if (shared_memory == MAP_FAILED) {
-        std::cerr << "Failed to map shared memory: " << strerror(errno) << std::endl;
-        return EXIT_FAILURE;
-    }
+    // // Create shared memory
+    // int shm_fd = shm_open(SHM_NAME, O_CREAT | O_RDWR, 0666);
+    // if (shm_fd == -1) {
+    //     std::cerr << "Failed to create shared memory: " << strerror(errno) << std::endl;
+    //     return EXIT_FAILURE;
+    // }
+    // if (ftruncate(shm_fd, SHM_SIZE) == -1) {
+    //     std::cerr << "Failed to set size of shared memory: " << strerror(errno) << std::endl;
+    //     return EXIT_FAILURE;
+    // }
+    // SharedMemory* shared_memory = static_cast<SharedMemory*>(mmap(nullptr, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0));
+    // if (shared_memory == MAP_FAILED) {
+    //     std::cerr << "Failed to map shared memory: " << strerror(errno) << std::endl;
+    //     return EXIT_FAILURE;
+    // }
 
-    // Create semaphore
-    sem_t* semaphore = sem_open(SEM_NAME, O_CREAT, 0666, 1);
-    if (semaphore == SEM_FAILED) {
-        std::cerr << "Failed to create semaphore: " << strerror(errno) << std::endl;
-        return EXIT_FAILURE;
-    }
+    // // Create semaphore
+    // sem_t* semaphore = sem_open(SEM_NAME, O_CREAT, 0666, 1);
+    // if (semaphore == SEM_FAILED) {
+    //     std::cerr << "Failed to create semaphore: " << strerror(errno) << std::endl;
+    //     return EXIT_FAILURE;
+    // }
 
-    LEDControl led_control(19, 28);
-    led_control_ptr = &led_control;
-    led_control.indicate_all(Color::GREEN);
-    usleep(3000000);
+    // LEDControl led_control(19, 28);
+    // led_control_ptr = &led_control;
+    // led_control.indicate_all(Color::GREEN);
+    // usleep(3000000);
 
-    Buttons buttons(16, 20, 21, shared_memory, semaphore);
-    std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
+    // Buttons buttons(16, 20, 21, shared_memory, semaphore);
+    // std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
-    BoundaryLogic boundary_logic;
-    States states(led_control, boundary_logic);
+    // BoundaryLogic boundary_logic;
+    // States states(led_control, boundary_logic);
 
-    RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
-    rtk_service_ptr = &rtk_service;
-    rtk_service.start_server();
+    // RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
+    // rtk_service_ptr = &rtk_service;
+    // rtk_service.start_server();
     
-    TCPServer server(PORT, led_control, states, shared_memory, semaphore);
-    server.start(shutdown_requested);
+    // TCPServer server(PORT, led_control, states, shared_memory, semaphore);
+    // server.start(shutdown_requested);
 
-    std::cout << "Shutting down safely..." << std::endl;
+    // std::cout << "Shutting down safely..." << std::endl;
 
-    if (rtk_service_ptr) {
-        std::cout << "Shutting down rtk service" << std::endl;
-        rtk_service_ptr->shutdown_server();
-        rtk_service_ptr = nullptr;
-    }
-    if (led_control_ptr) {
-        std::cout << "Shutting down led control" << std::endl;
-        led_control_ptr->clear();
-        led_control_ptr = nullptr;
-    }
-    if (button_thread.joinable()) {
-        button_thread.join();
-    }
-    gpioTerminate();
+    // if (rtk_service_ptr) {
+    //     std::cout << "Shutting down rtk service" << std::endl;
+    //     rtk_service_ptr->shutdown_server();
+    //     rtk_service_ptr = nullptr;
+    // }
+    // if (led_control_ptr) {
+    //     std::cout << "Shutting down led control" << std::endl;
+    //     led_control_ptr->clear();
+    //     led_control_ptr = nullptr;
+    // }
+    // if (button_thread.joinable()) {
+    //     button_thread.join();
+    // }
+    // gpioTerminate();
 
-    // Cleanup shared memory and semaphore
-    munmap(shared_memory, SHM_SIZE);
-    close(shm_fd);
-    shm_unlink(SHM_NAME);
-    sem_close(semaphore);
-    sem_unlink(SEM_NAME);
+    // // Cleanup shared memory and semaphore
+    // munmap(shared_memory, SHM_SIZE);
+    // close(shm_fd);
+    // shm_unlink(SHM_NAME);
+    // sem_close(semaphore);
+    // sem_unlink(SEM_NAME);
+
+    ApiClient api_client;
+    while (!shutdown_requested.load(std::memory_order_acquire)) {
+        nlohmann::json location_request = api_client.createLocationRequest(37.7749, -122.4194);
+        nlohmann::json mode_request = api_client.createModeRequest(0.5, "test_mode");
+        nlohmann::json location_response = api_client.sendRequest(location_request);
+        nlohmann::json mode_response = api_client.sendRequest(mode_request);
+        std::cout << "Location Response: " << location_response.dump(4) << std::endl;
+        std::cout << "Mode Response: " << mode_response.dump(4) << std::endl;
+
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
 
     return EXIT_SUCCESS;
 }
