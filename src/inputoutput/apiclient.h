@@ -22,12 +22,7 @@ public:
     nlohmann::json createModeRequest(float threshold, const std::string& mode);
 
     // Send a JSON request to the server and return the response
-    nlohmann::json sendRequest(const nlohmann::json& requestBody);
-
-private:
-    // HTTP client instance created in the constructor
-    std::unique_ptr<HttpClient> httpClient;
-    // Add any private members or helper functions if needed
+    nlohmann::json sendPostRequest(const nlohmann::json& requestBody);
 };
 
 #endif // API_H
