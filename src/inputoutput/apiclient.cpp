@@ -57,9 +57,9 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
         std::cerr << "CURL error: " << curl_easy_strerror(response) << std::endl;
     }
 
-    curl_slist_free_all(headers); // Free the headers list
-
     parser(responseString);
+
+    curl_slist_free_all(headers); // Free the headers list
 
     return responseString;
 }
