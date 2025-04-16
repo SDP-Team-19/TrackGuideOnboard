@@ -134,6 +134,53 @@ void LEDControl::update_leds(double distance) {
     ws2811_render(&_ledstring);
 }
 
+
+void LEDControl::test_interpolate(double distance, Color startColor, Color endColor)
+{
+    std::cout << "Testing interpolation with distance: " << distance << std::endl;
+
+    // Define minimum and maximum distances for the gradient
+    double minDistance = 0.0f;
+    double maxDistance = 100.0f;
+
+    // Define start and end colors
+    ColorChannels start = {0, 0, 0};
+    ColorChannels end = {0, 0, 0};
+
+    switch (startColor) {
+        case Color::RED: start = {255, 0, 0}; break;
+        case Color::GREEN: start = {0, 255, 0}; break;
+        case Color::BLUE: start = {0, 0, 255}; break;
+        case Color::YELLOW: start = {255, 255, 0}; break;
+        case Color::WHITE: start = {255, 255, 255}; break;
+        case Color::OFF: start = {0, 0, 0}; break;
+    }
+
+    switch (endColor) {
+        case Color::RED: end = {255, 0, 0}; break;
+        case Color::GREEN: end = {0, 255, 0}; break;
+        case Color::BLUE: end = {0, 0, 255}; break;
+        case Color::YELLOW: end = {255, 255, 0}; break;
+        case Color::WHITE: end = {255, 255, 255}; break;
+        case Color::OFF: end = {0, 0, 0}; break;
+    }
+
+    // Calculate the interpolation ratio
+    float ratio = mapDistanceToRatio(std::fabs(distance), minDistance, maxDistance);
+
+    // Get the interpolated color
+    ColorChannels currentColor = interpolateColor(start, end, ratio);
+
+    // Update the LED strip with the current color
+    for (int i = _stripLength; i < _stripLength; ++i) {
+        _ledstring.channel[1].leds[i] = map_color_channels(currentColor);
+    }
+
+    // Render the updated colors to the LED strip
+    ws2811_render(&_ledstring);
+}
+
+
 void LEDControl::clear() {
     std::cout << "Clearing the LED strip" << std::endl;
 
@@ -172,4 +219,8 @@ ws2811_led_t LEDControl::map_color(Color color) {
         case Color::OFF:    return 0x00000000;
         default:            return 0x00000000;
     }
+}
+
+ws2811_led_t LEDControl::map_color_channels(ColorChannels color) {
+    return (color.r << 16) | (color.g << 8) | color.b;
 }

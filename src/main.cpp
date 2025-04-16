@@ -66,10 +66,16 @@ int main() {
     //     return EXIT_FAILURE;
     // }
 
-    // LEDControl led_control(19, 28);
-    // led_control_ptr = &led_control;
-    // led_control.indicate_all(Color::GREEN);
-    // usleep(3000000);
+    LEDControl led_control(19, 27);
+    led_control_ptr = &led_control;
+    led_control.indicate_all(Color::GREEN);
+    usleep(3000000);
+    
+    // Test different distances from 0.0 to 1.0
+    for (float distance = 0.0; distance <= 100.0; distance += 0.5) {
+        led_control.test_interpolate(distance, Color::RED, Color::GREEN);
+        usleep(500000);  // Wait 500ms between each test
+    }
 
     // Buttons buttons(16, 20, 21, shared_memory, semaphore);
     // std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
@@ -108,17 +114,17 @@ int main() {
     // sem_close(semaphore);
     // sem_unlink(SEM_NAME);
 
-    ApiClient api_client;
-    while (!shutdown_requested.load(std::memory_order_acquire)) {
-        nlohmann::json location_request = api_client.createLocationRequest(37.7749, -122.4194);
-        nlohmann::json mode_request = api_client.createModeRequest(0.5, "test_mode");
-        nlohmann::json location_response = api_client.sendPostRequest(location_request);
-        // nlohmann::json mode_response = api_client.sendPostRequest("frontend-computer:8081", mode_request);
-        // std::cout << "Location Response: " << location_response.dump(4) << std::endl;
-        // std::cout << "Mode Response: " << mode_response.dump(4) << std::endl;
+    // ApiClient api_client;
+    // while (!shutdown_requested.load(std::memory_order_acquire)) {
+    //     nlohmann::json location_request = api_client.createLocationRequest(37.7749, -122.4194);
+    //     nlohmann::json mode_request = api_client.createModeRequest(0.5, "test_mode");
+    //     nlohmann::json location_response = api_client.sendPostRequest(location_request);
+    //     // nlohmann::json mode_response = api_client.sendPostRequest("frontend-computer:8081", mode_request);
+    //     // std::cout << "Location Response: " << location_response.dump(4) << std::endl;
+    //     // std::cout << "Mode Response: " << mode_response.dump(4) << std::endl;
 
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-    }
+    //     std::this_thread::sleep_for(std::chrono::seconds(3));
+    // }
 
     return EXIT_SUCCESS;
 }

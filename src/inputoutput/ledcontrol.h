@@ -36,6 +36,7 @@ public:
     void indicate_startup_message();
     void indicate_record_startup();
     void update_leds(double distance);
+    void test_interpolate(double distance, Color startColor, Color endColor);
     void clear();
 
 private:
@@ -44,6 +45,7 @@ private:
     ws2811_led_t map_color(Color color);
     float mapDistanceToRatio(double distance, double minDistance, double maxDistance);
     ColorChannels interpolateColor(ColorChannels startColor, ColorChannels endColor, float ratio);
+    ws2811_led_t map_color_channels(ColorChannels color);
 };
 
 #endif // LEDCONTROL_H
