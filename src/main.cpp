@@ -75,7 +75,7 @@ int main() {
     // Test different distances from 0.0 to 1.0
     for (float distance = -100.0; distance <= 100.0; distance += 0.1) {
         led_control_ptr->set_led_location(distance, Color::RED);
-        usleep(1000);  // Wait 500ms between each test
+        usleep(100000);  // Wait 500ms between each test
         led_control_ptr->clear();
     }
 
