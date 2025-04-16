@@ -165,11 +165,17 @@ void LEDControl::test_interpolate(double distance, Color startColor, Color endCo
         case Color::OFF: end = {0, 0, 0}; break;
     }
 
+    
+
     // Calculate the interpolation ratio
     float ratio = mapDistanceToRatio(std::fabs(distance), minDistance, maxDistance);
 
     // Get the interpolated color
     ColorChannels currentColor = interpolateColor(start, end, ratio);
+
+    std::cout << "Interpolated color: R=" << static_cast<int>(currentColor.r)
+              << ", G=" << static_cast<int>(currentColor.g)
+              << ", B=" << static_cast<int>(currentColor.b) << std::endl;
 
     // Update the LED strip with the current color
     for (int i = _stripLength; i < _stripLength; ++i) {
