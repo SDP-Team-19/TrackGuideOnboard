@@ -66,16 +66,16 @@ int main() {
     //     return EXIT_FAILURE;
     // }
 
-    LEDControl led_control(19, 27);
+    LEDControl led_control(19, 27, 100.0);
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
     led_control.clear();
 
     // Test different distances from 0.0 to 1.0
-    for (float distance = 0.0; distance <= 100.0; distance += 0.5) {
-        led_control.test_interpolate(distance, Color::RED, Color::GREEN);
-        usleep(500000);  // Wait 500ms between each test
+    for (float distance = -100.0; distance <= 100.0; distance += 1) {
+        led_control.set_led_location(distance, Color::RED);
+        usleep(250000);  // Wait 500ms between each test
     }
 
     // Buttons buttons(16, 20, 21, shared_memory, semaphore);

@@ -2,8 +2,8 @@
 #include "ledcontrol.h"
 #define LEFTRIGHTSIZE 14
 
-LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength)
-    : _stripLength(stripLength) {
+LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength, double maxDistance)
+    : _stripLength(stripLength), _maxDistance(maxDistance) {
     std::cout << "LED strip initialized on GPIO pin " << static_cast<int>(gpioPin) 
               << " with length " << stripLength << std::endl;
 
@@ -99,36 +99,18 @@ void LEDControl::indicate_record_startup() {
     indicate_all(Color::RED);
 }
 
-void LEDControl::update_leds(double distance) {
-    // Define minimum and maximum distances for the gradient
-    double minDistance = 0.0f;
-    double maxDistance = 100.0f;
-    int start = _stripLength-LEFTRIGHTSIZE;
-    int end = _stripLength;
+void LEDControl::set_led_location(double distance, Color color) {
+    std::cout << "Setting LED location with distance: " << distance << " and color: " << static_cast<int>(color) << std::endl;
 
-    // Define start (green) and end (red) colors
-    ColorChannels green = {0, 255, 0};
-    ColorChannels red = {255, 0, 0};
+    // Map the distance to the LED index
+    int ledIndex = static_cast<int>((std::abs(distance) / _maxDistance) * _stripLength);
+    if (distance < 0) ledIndex = (_stripLength / 2) - ledIndex;
+    else ledIndex = (_stripLength / 2) + ledIndex;
+    if (ledIndex < 0) ledIndex = 0;
+    if (ledIndex >= _stripLength) ledIndex = _stripLength - 1;
 
-    // Calculate the interpolation ratio
-    float ratio = mapDistanceToRatio(std::fabs(distance), minDistance, maxDistance);
-
-    // Get the interpolated color
-    ColorChannels currentColor = interpolateColor(green, red, ratio);
-
-    // Update the LED strip with the current color
-    if (distance > 0)
-    {
-        start = 0;
-        end = LEFTRIGHTSIZE;
-    }
-    if (start >= 0 && start < _stripLength && end >= 0 && end <= _stripLength) {
-        for (int i = start; i < end; ++i) {
-            _ledstring.channel[1].leds[i] = (currentColor.r << 16) | (currentColor.g << 8) | currentColor.b;
-        }
-    } else {
-        std::cerr << "Error: Invalid range: start = " << start << ", end = " << end << ", strip length = " << _stripLength << std::endl;
-    }
+    // Set the color of the specified LED
+    _ledstring.channel[1].leds[ledIndex] = map_color(color);
 
     // Render the updated colors to the LED strip
     ws2811_render(&_ledstring);

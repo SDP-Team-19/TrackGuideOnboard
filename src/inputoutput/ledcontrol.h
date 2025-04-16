@@ -28,20 +28,21 @@ typedef struct {
 
 class LEDControl {
 public:
-    LEDControl(uint8_t gpioPin, uint16_t stripLength);
+    LEDControl(uint8_t gpioPin, uint16_t stripLength, double maxDistance);
     void indicate_left(Color color);
     void indicate_right(Color color);
     void indicate_both(Color color);
     void indicate_all(Color color);
     void indicate_startup_message();
     void indicate_record_startup();
-    void update_leds(double distance);
     void test_interpolate(double distance, Color startColor, Color endColor);
     void clear();
+    void set_led_location(double distance, Color color);
 
 private:
     uint16_t _stripLength;
     ws2811_t _ledstring;
+    double _maxDistance;
     ws2811_led_t map_color(Color color);
     float mapDistanceToRatio(double distance, double minDistance, double maxDistance);
     ColorChannels interpolateColor(ColorChannels startColor, ColorChannels endColor, float ratio);
