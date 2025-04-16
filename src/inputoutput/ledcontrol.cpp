@@ -103,7 +103,8 @@ void LEDControl::set_led_location(double distance, Color color) {
     std::cout << "Setting LED location with distance: " << distance << " and color: " << static_cast<int>(color) << std::endl;
 
     // Map the distance to the LED index
-    int ledIndex = static_cast<int>((distance + _maxDistance / 2*_maxDistance) * _stripLength);
+    int ledIndex = static_cast<int>((distance + _maxDistance) * _stripLength / (2 * _maxDistance));
+    std::cout << "Mapped LED index: " << ledIndex << std::endl;
     if (ledIndex < 0) {
         ledIndex = 0;
     } else if (ledIndex >= _stripLength) {
