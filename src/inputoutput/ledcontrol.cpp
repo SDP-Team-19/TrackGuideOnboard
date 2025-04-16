@@ -23,7 +23,7 @@ LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength)
                 .invert = 0,
                 .count = stripLength,
                 .strip_type = WS2812_STRIP,
-                .brightness = 255,
+                .brightness = 255, 
             },
         },
     };
@@ -124,7 +124,7 @@ void LEDControl::update_leds(double distance) {
     }
     if (start >= 0 && start < _stripLength && end >= 0 && end <= _stripLength) {
         for (int i = start; i < end; ++i) {
-            _ledstring.channel[0].leds[i] = (currentColor.r << 16) | (currentColor.g << 8) | currentColor.b;
+            _ledstring.channel[1].leds[i] = (currentColor.r << 16) | (currentColor.g << 8) | currentColor.b;
         }
     } else {
         std::cerr << "Error: Invalid range: start = " << start << ", end = " << end << ", strip length = " << _stripLength << std::endl;
@@ -192,7 +192,7 @@ void LEDControl::clear() {
     std::cout << "Clearing the LED strip" << std::endl;
 
     for (int i = 0; i < _stripLength; ++i) {
-        _ledstring.channel[0].leds[i] = 0x00000000;
+        _ledstring.channel[1].leds[i] = 0x00000000;
     }
 
     ws2811_render(&_ledstring);
