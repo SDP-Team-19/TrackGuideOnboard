@@ -228,5 +228,13 @@ ws2811_led_t LEDControl::map_color(Color color) {
 }
 
 ws2811_led_t LEDControl::map_color_channels(ColorChannels color) {
-    return (color.r << 16) | (color.g << 8) | color.b;
+    std::cout << "Mapping RGB: ("
+              << static_cast<int>(color.r) << ", "
+              << static_cast<int>(color.g) << ", "
+              << static_cast<int>(color.b) << ")\n";
+    
+    ws2811_led_t mapped = (color.r << 16) | (color.g << 8) | color.b;
+    std::cout << "Mapped value: 0x" << std::hex << mapped << std::dec << "\n";
+    
+    return mapped;
 }
