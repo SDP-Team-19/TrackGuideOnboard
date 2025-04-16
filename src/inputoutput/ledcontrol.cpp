@@ -179,6 +179,7 @@ void LEDControl::test_interpolate(double distance, Color startColor, Color endCo
 
     // Update the LED strip with the current color
     for (int i = _stripLength; i < _stripLength; ++i) {
+        
         _ledstring.channel[1].leds[i] = map_color_channels(currentColor);
     }
 
@@ -191,7 +192,7 @@ void LEDControl::clear() {
     std::cout << "Clearing the LED strip" << std::endl;
 
     for (int i = 0; i < _stripLength; ++i) {
-        _ledstring.channel[1].leds[i] = 0x00000000;
+        _ledstring.channel[0].leds[i] = 0x00000000;
     }
 
     ws2811_render(&_ledstring);
