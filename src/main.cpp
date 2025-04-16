@@ -70,7 +70,8 @@ int main() {
     led_control_ptr = &led_control;
     led_control.indicate_all(Color::GREEN);
     usleep(3000000);
-    
+    led_control.clear()
+
     // Test different distances from 0.0 to 1.0
     for (float distance = 0.0; distance <= 100.0; distance += 0.5) {
         led_control.test_interpolate(distance, Color::RED, Color::GREEN);
