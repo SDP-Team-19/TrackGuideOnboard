@@ -178,7 +178,7 @@ void LEDControl::test_interpolate(double distance, Color startColor, Color endCo
               << ", B=" << static_cast<int>(currentColor.b) << std::endl;
 
     // Update the LED strip with the current color
-    for (int i = _stripLength; i < _stripLength; ++i) {
+    for (int i = 0; i < _stripLength; ++i) {
         std::cout << "Updating LED " << i << " to color: R=" << static_cast<int>(currentColor.r)
                   << ", G=" << static_cast<int>(currentColor.g)
                   << ", B=" << static_cast<int>(currentColor.b) << std::endl;
