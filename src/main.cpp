@@ -68,15 +68,15 @@ int main() {
 
     LEDControl led_control(19, 27, 100.0);
     led_control_ptr = &led_control;
-    led_control.indicate_all(Color::GREEN);
+    led_control_ptr->indicate_all(Color::GREEN);
     usleep(3000000);
-    led_control.clear();
+    led_control_ptr ->clear();
 
     // Test different distances from 0.0 to 1.0
-    for (float distance = -100.0; distance <= 100.0; distance += 1) {
-        led_control.set_led_location(distance, Color::RED);
-        usleep(250000);  // Wait 500ms between each test
-        led_control.clear();
+    for (float distance = -100.0; distance <= 100.0; distance += 0.1) {
+        led_control_ptr->set_led_location(distance, Color::RED);
+        usleep(1000);  // Wait 500ms between each test
+        led_control_ptr->clear();
     }
 
     // Buttons buttons(16, 20, 21, shared_memory, semaphore);
@@ -99,11 +99,11 @@ int main() {
     //     rtk_service_ptr->shutdown_server();
     //     rtk_service_ptr = nullptr;
     // }
-    // if (led_control_ptr) {
-    //     std::cout << "Shutting down led control" << std::endl;
-    //     led_control_ptr->clear();
-    //     led_control_ptr = nullptr;
-    // }
+    if (led_control_ptr) {
+        std::cout << "Shutting down led control" << std::endl;
+        led_control_ptr->clear();
+        led_control_ptr = nullptr;
+    }
     // if (button_thread.joinable()) {
     //     button_thread.join();
     // }
