@@ -75,8 +75,8 @@ int main() {
     // Test different distances from 0.0 to 1.0
     for (float distance = -100.0; distance <= 100.0; distance += 1) {
         led_control.set_led_location(distance, Color::RED);
-        led_control.clear();
         usleep(250000);  // Wait 500ms between each test
+        led_control.clear();
     }
 
     // Buttons buttons(16, 20, 21, shared_memory, semaphore);
