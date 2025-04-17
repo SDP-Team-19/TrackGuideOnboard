@@ -3,8 +3,9 @@
 #include <vector>
 #define LEFTRIGHTSIZE 14
 
-LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength, double maxDistance)
-    : _stripLength(stripLength), _maxDistance(maxDistance) {
+LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength, double maxDistance, double red_speed, double yellow_speed)
+    : _stripLength(stripLength), _maxDistance(maxDistance),
+      _red_threshold(red_speed), _yellow_threshold(yellow_speed) {
     std::cout << "LED strip initialized on GPIO pin " << static_cast<int>(gpioPin) 
               << " with length " << stripLength << std::endl;
 
@@ -100,7 +101,7 @@ void LEDControl::indicate_record_startup() {
     indicate_all(Color::RED);
 }
 
-void LEDControl::set_led_location(double distance, Color color, int pixel_width) {
+void LEDControl::set_led_location(double distance, ws2811_led_t color, int pixel_width) {
     std::cout << "Setting LED location with distance: " << distance 
               << ", pixel width: " << pixel_width 
               << ", and color: " << static_cast<int>(color) << std::endl;
@@ -119,20 +120,11 @@ void LEDControl::set_led_location(double distance, Color color, int pixel_width)
         }
     }
 
-    // Get the base color
-    ws2811_led_t baseColor = map_color(color);
-    
-    // Extract RGB components
-    uint8_t r = (baseColor >> 16) & 0xFF;
-    uint8_t g = (baseColor >> 8) & 0xFF;
-    uint8_t b = baseColor & 0xFF;
 
     // Apply brightness to each LED
     for (int i = 0; i < _stripLength; i++) {
         if (ledBrightness[i] > 0.0) {
-            _ledstring.channel[1].leds[i] = ((static_cast<uint32_t>(r * ledBrightness[i]) << 16) |
-                                           (static_cast<uint32_t>(g * ledBrightness[i]) << 8) |
-                                           static_cast<uint32_t>(b * ledBrightness[i]));
+            _ledstring.channel[1].leds[i] = color;
         } else {
             _ledstring.channel[1].leds[i] = 0;
         }
@@ -140,6 +132,71 @@ void LEDControl::set_led_location(double distance, Color color, int pixel_width)
 
     // Render the updated colors to the LED strip
     ws2811_render(&_ledstring);
+}
+
+ws2811_led_t LEDControl::get_interpolated_breaking_color(double current_speed, double expected_speed, Color startColor, Color midColor, Color endColor){
+    std::cout << "Interpolating breaking color with current velocity: " << current_speed 
+              << ", expected velocity: " << expected_speed << std::endl;
+
+    // Define start and end colors
+    ColorChannels start = {0, 0, 0};
+    ColorChannels mid = {0, 0, 0};
+    ColorChannels end = {0, 0, 0};
+
+    switch (startColor) {
+        case Color::RED: start = {255, 0, 0}; break;
+        case Color::GREEN: start = {0, 255, 0}; break;
+        case Color::BLUE: start = {0, 0, 255}; break;
+        case Color::YELLOW: start = {255, 255, 0}; break;
+        case Color::WHITE: start = {255, 255, 255}; break;
+        case Color::OFF: start = {0, 0, 0}; break;
+    }
+
+    switch (midColor)
+    {
+        case Color::RED: mid = {255, 0, 0}; break;
+        case Color::GREEN: mid = {0, 255, 0}; break;
+        case Color::BLUE: mid = {0, 0, 255}; break;
+        case Color::YELLOW: mid = {255, 255, 0}; break;
+        case Color::WHITE: mid = {255, 255, 255}; break;
+        case Color::OFF: mid = {0, 0, 0}; break;
+    }
+
+    switch (endColor) {
+        case Color::RED: end = {255, 0, 0}; break;
+        case Color::GREEN: end = {0, 255, 0}; break;
+        case Color::BLUE: end = {0, 0, 255}; break;
+        case Color::YELLOW: end = {255, 255, 0}; break;
+        case Color::WHITE: end = {255, 255, 255}; break;
+        case Color::OFF: end = {0, 0, 0}; break;
+    }
+
+    // Calculate the difference between the current and expected velocities
+    double difference = current_speed - expected_speed;
+    float ratio;
+    ColorChannels currentColor;
+
+    if (difference <= 0) {
+        // Under expected velocity - show green
+        currentColor = start;
+    } else if (difference <= _yellow_threshold) {
+        // Interpolate between green and yellow
+        ratio = difference / _yellow_threshold;
+        currentColor = interpolateColor(start, mid, ratio);
+    } else if (difference <= _yellow_threshold + _red_threshold) {
+        // Interpolate between yellow and red
+        ratio = (difference - _yellow_threshold) / _red_threshold;
+        currentColor = interpolateColor(mid, end, ratio);
+    } else {
+        // Above thresholds - show red
+        currentColor = end;
+    }
+
+    std::cout << "Interpolated color: R=" << static_cast<int>(currentColor.r)
+              << ", G=" << static_cast<int>(currentColor.g)
+              << ", B=" << static_cast<int>(currentColor.b) << std::endl;
+
+    return map_color_channels(currentColor);
 }
 
 
