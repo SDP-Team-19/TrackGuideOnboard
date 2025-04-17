@@ -85,7 +85,7 @@ void LEDControl::led_location_bounce_animation(Color color, int pixel_width) {
     // Forward Pass
     for (double i = -_maxDistance; i <= _maxDistance; i+=0.1) {
         set_led_location(i, mapped_color, pixel_width);
-        usleep(500); // Sleep for 0.5ms
+        usleep(100); // Sleep for 0.5ms
         clear();
     }
     // Backward Pass

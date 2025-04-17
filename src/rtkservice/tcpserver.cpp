@@ -89,7 +89,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         FD_ZERO(&read_fds);
         FD_SET(serverSocket_, &read_fds);
 
-        struct timeval timeout = {0, 100000};  // 100 milliseconds timeout (0.1 seconds)
+        struct timeval timeout = {1, 0};  // 1 second timeout
         int activity = select(serverSocket_ + 1, &read_fds, NULL, NULL, &timeout);
         if (activity == -1) {
             if (errno == EINTR) continue; // Retry if interrupted by signal
