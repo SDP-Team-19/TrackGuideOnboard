@@ -88,7 +88,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     // Start animation in background
     auto run_animation = [this]() {
         while (true) {
-            ledController_.led_location_bounce_animation();
+            ledController_.led_location_bounce_animation(Color::BLUE, 3);
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     };
@@ -135,24 +135,21 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 
         std::cout << "Connection received from " << inet_ntoa(client_addr.sin_addr) << std::endl;
 
-        // Handle client asynchronously
-        std::async(std::launch::async, [this, client_socket, &shutdown_requested, &startup_received]() {
-            char initial_byte;
-            if (recv(client_socket, &initial_byte, 1, MSG_PEEK) == -1) {
-                std::cerr << "recv() error: " << strerror(errno) << std::endl;
-                close(client_socket);
-                return;
-            }
+        char initial_byte;
+        if (recv(client_socket, &initial_byte, 1, MSG_PEEK) == -1) {
+            std::cerr << "recv() error: " << strerror(errno) << std::endl;
+            close(client_socket);
+            continue;
+        }
 
-            if (initial_byte == '%') {
-                std::cout << "Startup message received from server" << std::endl;
-                startup_received = true;
-                close(client_socket);
-            } else {
-                startup_received = false;
-                handle_client(client_socket, shutdown_requested);
-            }
-        });
+        if (initial_byte == '%') {
+            std::cout << "Startup message received from server" << std::endl;
+            startup_received = true;
+            close(client_socket);
+        } else {
+            startup_received = false;
+            handle_client(client_socket, shutdown_requested);
+        }
     }
 
     // Stop any running animation before shutting down
