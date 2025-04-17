@@ -37,7 +37,7 @@ public:
     void indicate_record_startup();
     void test_interpolate(double distance, Color startColor, Color endColor);
     void clear();
-    void set_led_location(double distance, Color color);
+    void set_led_location(double distance, Color color, int pixel_width = 3);
 
 private:
     uint16_t _stripLength;

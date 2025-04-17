@@ -1,5 +1,6 @@
 // filepath: /Users/mitchellsylvia/TrackGuideOnboard/src/ledcontrol/ledcontrol.cpp
 #include "ledcontrol.h"
+#include <vector>
 #define LEFTRIGHTSIZE 14
 
 LEDControl::LEDControl(uint8_t gpioPin, uint16_t stripLength, double maxDistance)
@@ -99,22 +100,24 @@ void LEDControl::indicate_record_startup() {
     indicate_all(Color::RED);
 }
 
-void LEDControl::set_led_location(double distance, Color color) {
-    std::cout << "Setting LED location with distance: " << distance << " and color: " << static_cast<int>(color) << std::endl;
+void LEDControl::set_led_location(double distance, Color color, int pixel_width = 3) {
+    std::cout << "Setting LED location with distance: " << distance 
+              << ", pixel width: " << pixel_width 
+              << ", and color: " << static_cast<int>(color) << std::endl;
 
     // Map the distance to a floating-point LED position
     double ledPosition = (distance + _maxDistance) * (_stripLength - 1) / (2 * _maxDistance);
+    std::vector<double> ledBrightness(_stripLength);
     
-    // Get the two adjacent LED indices
-    int ledIndex1 = static_cast<int>(floor(ledPosition));
-    int ledIndex2 = ledIndex1 + 1;
-    
-    // Calculate the fractional part for brightness interpolation
-    double fraction = ledPosition - ledIndex1;
-
-    // Ensure indices are within bounds
-    ledIndex1 = std::max(0, std::min(ledIndex1, _stripLength - 1));
-    ledIndex2 = std::max(0, std::min(ledIndex2, _stripLength - 1));
+    // Calculate brightness values for each LED based on pixel_width
+    for (int i = 0; i < _stripLength; i++) {
+        double distanceFromCenter = std::abs(i - ledPosition);
+        if (distanceFromCenter <= pixel_width / 2.0) {
+            // Create a triangular brightness distribution
+            ledBrightness[i] = 1.0 - (2.0 * distanceFromCenter / pixel_width);
+            ledBrightness[i] = std::max(0.0, std::min(1.0, ledBrightness[i]));
+        }
+    }
 
     // Get the base color
     ws2811_led_t baseColor = map_color(color);
@@ -124,18 +127,13 @@ void LEDControl::set_led_location(double distance, Color color) {
     uint8_t g = (baseColor >> 8) & 0xFF;
     uint8_t b = baseColor & 0xFF;
 
-    // Set the colors with interpolated brightness
-    _ledstring.channel[1].leds[ledIndex1] = ((static_cast<uint32_t>(r * (1.0 - fraction)) << 16) |
-                                            (static_cast<uint32_t>(g * (1.0 - fraction)) << 8) |
-                                            static_cast<uint32_t>(b * (1.0 - fraction)));
-    
-    _ledstring.channel[1].leds[ledIndex2] = ((static_cast<uint32_t>(r * fraction) << 16) |
-                                            (static_cast<uint32_t>(g * fraction) << 8) |
-                                            static_cast<uint32_t>(b * fraction));
-
-    // Clear all other LEDs
+    // Apply brightness to each LED
     for (int i = 0; i < _stripLength; i++) {
-        if (i != ledIndex1 && i != ledIndex2) {
+        if (ledBrightness[i] > 0.0) {
+            _ledstring.channel[1].leds[i] = ((static_cast<uint32_t>(r * ledBrightness[i]) << 16) |
+                                           (static_cast<uint32_t>(g * ledBrightness[i]) << 8) |
+                                           static_cast<uint32_t>(b * ledBrightness[i]));
+        } else {
             _ledstring.channel[1].leds[i] = 0;
         }
     }
