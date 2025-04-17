@@ -74,11 +74,11 @@ int main() {
 
     // Test different distances from 0.0 to 1.0
     double expected_speed = 10.0;
-    for (float distance = -100.0; distance <= 100.0; distance += 0.1) {
+    for (float distance = -100.0; distance <= 100.0; distance += 0.5) {
         for (float speed = 5.0; speed <= 25.0; speed += 0.1) {
             ws2811_led_t color = led_control_ptr->get_interpolated_breaking_color(speed, expected_speed, Color::GREEN, Color::YELLOW, Color::RED);
             led_control_ptr->set_led_location(distance, color);
-            usleep(10000);  // Wait 5ms between each test
+            usleep(50000);  // Wait 5ms between each test
         }
         // usleep(2000);  // Wait 10ms between each test
         led_control_ptr->clear();
