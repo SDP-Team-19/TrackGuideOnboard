@@ -119,12 +119,18 @@ void LEDControl::set_led_location(double distance, ws2811_led_t color, int pixel
             ledBrightness[i] = std::max(0.0, std::min(1.0, ledBrightness[i]));
         }
     }
-
+    
+    // Extract RGB components
+    uint8_t r = (color >> 16) & 0xFF;
+    uint8_t g = (color >> 8) & 0xFF;
+    uint8_t b = color & 0xFF;
 
     // Apply brightness to each LED
     for (int i = 0; i < _stripLength; i++) {
         if (ledBrightness[i] > 0.0) {
-            _ledstring.channel[1].leds[i] = color;
+            _ledstring.channel[1].leds[i] = ((static_cast<uint32_t>(r * ledBrightness[i]) << 16) |
+                                           (static_cast<uint32_t>(g * ledBrightness[i]) << 8) |
+                                           static_cast<uint32_t>(b * ledBrightness[i]));
         } else {
             _ledstring.channel[1].leds[i] = 0;
         }
