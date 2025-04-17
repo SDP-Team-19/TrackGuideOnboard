@@ -82,6 +82,16 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     struct sockaddr_in client_addr;
     socklen_t sin_size = sizeof(struct sockaddr_in);
     int client_socket;
+    bool startup_received = false;
+    std::future<void> animation_future;
+
+    // Start animation in background
+    auto run_animation = [this]() {
+        while (true) {
+            ledController_.led_location_bounce_animation();
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    };
 
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_acquire)) {
@@ -91,45 +101,63 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 
         struct timeval timeout = {1, 0};  // 1 second timeout
         int activity = select(serverSocket_ + 1, &read_fds, NULL, NULL, &timeout);
+        
         if (activity == -1) {
-            if (errno == EINTR) continue; // Retry if interrupted by signal
+            if (errno == EINTR) continue;
             std::cerr << "select() failed: " << strerror(errno) << std::endl;
             return;
         }
-        if (activity == 0) continue;  // Timeout expired, check shutdown_requested
+
+        if (activity == 0) {
+            if (startup_received && !animation_future.valid()) {
+                animation_future = std::async(std::launch::async, run_animation);
+            }
+            continue;
+        }
+
+        // Stop animation if connection received
+        if (animation_future.valid()) {
+            animation_future = std::future<void>();
+        }
 
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
 
         if (client_socket == -1) {
-            if (errno == EINTR) return; // Allow shutdown
+            if (errno == EINTR) return;
             std::cerr << "Accept failed: " << strerror(errno) << std::endl;
             continue;
         }
 
         if (shutdown_requested.load(std::memory_order_acquire)) {
             close(client_socket);
-            return; // Exit loop if shutdown is requested
+            return;
         }
 
         std::cout << "Connection received from " << inet_ntoa(client_addr.sin_addr) << std::endl;
 
-        // Read the first byte to check if it starts with '%'
-        char initial_byte;
-        ssize_t bytes_received = recv(client_socket, &initial_byte, 1, MSG_PEEK);
-        if (bytes_received == -1) {
-            std::cerr << "recv() error: " << strerror(errno) << std::endl;
-            close(client_socket);
-            continue;
-        }
+        // Handle client asynchronously
+        std::async(std::launch::async, [this, client_socket, &shutdown_requested, &startup_received]() {
+            char initial_byte;
+            if (recv(client_socket, &initial_byte, 1, MSG_PEEK) == -1) {
+                std::cerr << "recv() error: " << strerror(errno) << std::endl;
+                close(client_socket);
+                return;
+            }
 
-        if (initial_byte == '%') {
-            // Handle the client in the same process
-            std::cout << "Startup message received from server" << std::endl;
-            ledController_.indicate_startup_message();
-            close(client_socket);
-        } else {
-            handle_client(client_socket, shutdown_requested);
-        }
+            if (initial_byte == '%') {
+                std::cout << "Startup message received from server" << std::endl;
+                startup_received = true;
+                close(client_socket);
+            } else {
+                startup_received = false;
+                handle_client(client_socket, shutdown_requested);
+            }
+        });
+    }
+
+    // Stop any running animation before shutting down
+    if (animation_future.valid()) {
+        animation_future = std::future<void>();
     }
     std::cout << "Server shutting down..." << std::endl;
     close_server();
