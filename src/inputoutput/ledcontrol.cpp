@@ -100,7 +100,7 @@ void LEDControl::indicate_record_startup() {
     indicate_all(Color::RED);
 }
 
-void LEDControl::set_led_location(double distance, Color color, int pixel_width = 3) {
+void LEDControl::set_led_location(double distance, Color color, int pixel_width) {
     std::cout << "Setting LED location with distance: " << distance 
               << ", pixel width: " << pixel_width 
               << ", and color: " << static_cast<int>(color) << std::endl;
