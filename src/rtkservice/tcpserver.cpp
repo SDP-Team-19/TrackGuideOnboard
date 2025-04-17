@@ -87,10 +87,12 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     std::future<void> animation_future;
 
     // Start animation in background
-    auto run_animation = [this]() {
-        while (true) {
+    auto run_animation = [&shutdown_requested, this]() {
+        while (!shutdown_requested.load(std::memory_order_acquire)) {
             ledController_.led_location_bounce_animation(Color::BLUE, 3);
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            for (int i = 0; i < 10 && !shutdown_requested.load(); i++) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         }
     };
 
@@ -131,7 +133,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 
         if (shutdown_requested.load(std::memory_order_acquire)) {
             close(client_socket);
-            return;
+            break;
         }
 
         std::cout << "Connection received from " << inet_ntoa(client_addr.sin_addr) << std::endl;
@@ -153,10 +155,11 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         }
     }
 
-    // Stop any running animation before shutting down
+    // Ensure animation thread is stopped
     if (animation_future.valid()) {
         animation_future = std::future<void>();
     }
+    ledController_.clear();
     std::cout << "Server shutting down..." << std::endl;
     close_server();
 }

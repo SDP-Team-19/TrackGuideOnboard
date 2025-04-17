@@ -120,9 +120,6 @@ void LEDControl::indicate_record_startup() {
 }
 
 void LEDControl::set_led_location(double distance, ws2811_led_t color, int pixel_width) {
-    std::cout << "Setting LED location with distance: " << distance 
-              << ", pixel width: " << pixel_width 
-              << ", and color: " << static_cast<int>(color) << std::endl;
 
     // Map the distance to a floating-point LED position
     double ledPosition = (distance + _maxDistance) * (_stripLength - 1) / (2 * _maxDistance);
@@ -281,8 +278,6 @@ void LEDControl::test_interpolate(double distance, Color startColor, Color endCo
 
 
 void LEDControl::clear() {
-    std::cout << "Clearing the LED strip" << std::endl;
-
     for (int i = 0; i < _stripLength; ++i) {
         _ledstring.channel[1].leds[i] = 0x00000000;
     }
