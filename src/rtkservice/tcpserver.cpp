@@ -83,18 +83,18 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     struct sockaddr_in client_addr;
     socklen_t sin_size = sizeof(struct sockaddr_in);
     int client_socket;
-    bool startup_received = false;
     std::future<void> animation_future;
 
     // Start animation in background
     auto run_animation = [&shutdown_requested, this]() {
         while (!shutdown_requested.load(std::memory_order_acquire)) {
             ledController_.led_location_bounce_animation(Color::BLUE, 3);
-            for (int i = 0; i < 10 && !shutdown_requested.load(); i++) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     };
+
+    // Start animation immediately
+    animation_future = std::async(std::launch::async, run_animation);
 
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_acquire)) {
@@ -112,15 +112,11 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         }
 
         if (activity == 0) {
-            if (startup_received && !animation_future.valid()) {
+            // If no connection and animation isn't running, restart it
+            if (!animation_future.valid()) {
                 animation_future = std::async(std::launch::async, run_animation);
             }
             continue;
-        }
-
-        // Stop animation if connection received
-        if (animation_future.valid()) {
-            animation_future = std::future<void>();
         }
 
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
@@ -147,10 +143,11 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
 
         if (initial_byte == '%') {
             std::cout << "Startup message received from server" << std::endl;
-            startup_received = true;
             close(client_socket);
         } else {
-            startup_received = false;
+            if (animation_future.valid()) {
+                animation_future = std::future<void>();
+            }
             handle_client(client_socket, shutdown_requested);
         }
     }
