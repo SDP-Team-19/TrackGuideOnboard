@@ -83,13 +83,13 @@ void LEDControl::led_location_bounce_animation(Color color, int pixel_width) {
     ws2811_led_t mapped_color = map_color(color);
 
     // Forward Pass
-    for (int i = -_maxDistance; i <= _maxDistance; i+=0.1) {
+    for (double i = -_maxDistance; i <= _maxDistance; i+=0.1) {
         set_led_location(i, mapped_color, pixel_width);
         usleep(5000); // Sleep for 5ms
         clear();
     }
     // Backward Pass
-    for (int i = _maxDistance; i >= -_maxDistance; i-=0.1) {
+    for (double i = _maxDistance; i >= -_maxDistance; i-=0.1) {
         set_led_location(i, mapped_color, pixel_width);
         usleep(5000); // Sleep for 5ms
         clear();
