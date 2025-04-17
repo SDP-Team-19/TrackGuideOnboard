@@ -89,7 +89,7 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
         FD_ZERO(&read_fds);
         FD_SET(serverSocket_, &read_fds);
 
-        struct timeval timeout = {1, 0};  // 1 second timeout
+        struct timeval timeout = {0, 100000};  // 100 milliseconds timeout (0.1 seconds)
         int activity = select(serverSocket_ + 1, &read_fds, NULL, NULL, &timeout);
         if (activity == -1) {
             if (errno == EINTR) continue; // Retry if interrupted by signal
@@ -129,21 +129,6 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
             close(client_socket);
         } else {
             handle_client(client_socket, shutdown_requested);
-            // // Fork a new process to handle the client
-            // pid_t pid = fork();
-            // if (pid == -1) {
-            //     std::cerr << "Fork failed: " << strerror(errno) << std::endl;
-            //     close(client_socket);
-            //     continue;
-            // } else if (pid == 0) {
-            //     // Child process
-            //     close_server(); // Close the listening socket in the child process
-                
-            //     exit(EXIT_SUCCESS);
-            // } else {
-            //     // Parent process
-            //     close(client_socket); // Close the client socket in the parent process
-            // }
         }
     }
     std::cout << "Server shutting down..." << std::endl;
