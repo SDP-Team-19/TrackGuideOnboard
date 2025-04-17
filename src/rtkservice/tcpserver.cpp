@@ -6,6 +6,7 @@
 #include <sys/stat.h>   // For mode constants
 #include <semaphore.h>  // For semaphores
 #include <semaphoreguard.h>
+#include <thread>       // For std::this_thread::sleep_for
 
 std::ostream& operator<<(std::ostream& os, const SystemState& state) {
     switch (state) {
