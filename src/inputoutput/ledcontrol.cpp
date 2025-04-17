@@ -78,6 +78,24 @@ void LEDControl::indicate_all(Color color) {
     ws2811_render(&_ledstring);
 }
 
+void LEDControl::led_location_bounce_animation(Color color, int pixel_width) {
+    std::cout << "Starting LED location slide animation" << std::endl;
+    ws2811_led_t mapped_color = map_color(color);
+
+    // Forward Pass
+    for (int i = 0; i <= _maxDistance; i+=0.1) {
+        set_led_location(i * 0.1, mapped_color, pixel_width);
+        usleep(5000); // Sleep for 5ms
+        clear();
+    }
+    // Backward Pass
+    for (int i = 10; i >= 0; i-=0.1) {
+        set_led_location(i * 0.1, mapped_color, pixel_width);
+        usleep(5000); // Sleep for 5ms
+        clear();
+    }
+}
+
 void LEDControl::indicate_startup_message() {
     std::cout << "Indicating startup message" << std::endl;
 

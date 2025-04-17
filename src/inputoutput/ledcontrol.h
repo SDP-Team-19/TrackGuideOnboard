@@ -39,6 +39,8 @@ public:
     void test_interpolate(double distance, Color startColor, Color endColor);
     void clear();
     void set_led_location(double distance, ws2811_led_t color, int pixel_width = 3);
+    ws2811_led_t map_color(Color color);
+    void led_location_bounce_animation(Color color, int pixel_width);
 
 private:
     uint16_t _stripLength;
@@ -46,7 +48,6 @@ private:
     double _maxDistance;
     double _red_threshold;
     double _yellow_threshold;
-    ws2811_led_t map_color(Color color);
     float mapDistanceToRatio(double distance, double minDistance, double maxDistance);
     ColorChannels interpolateColor(ColorChannels startColor, ColorChannels endColor, float ratio);
     ws2811_led_t map_color_channels(ColorChannels color);

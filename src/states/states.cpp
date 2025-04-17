@@ -70,25 +70,7 @@ void States::run_play_function(const char* content) {
         if(track_loaded_){
             double distance = boundaryLogic_.calculate_distance(latitude, longitude);
             std::cout << "Distance from track (cm): " << distance << std::endl;
-            if (distance > 0) {
-                if (distance < 100)
-                {
-                    ledController_.indicate_right(Color::GREEN);
-                }
-                else
-                {
-                    ledController_.indicate_right(Color::RED);
-                }
-            } else {
-                if (distance > -100)
-                {
-                    ledController_.indicate_left(Color::GREEN);
-                }
-                else
-                {
-                    ledController_.indicate_left(Color::RED);
-                }
-            }
+            ledController_.set_led_location(distance, ledController_.map_color(Color::RED), 3);
         }
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;
