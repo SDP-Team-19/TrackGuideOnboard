@@ -92,3 +92,11 @@ void States::run_reset_function() {
         std::cout << "coordinates.csv successfully deleted" << std::endl;
     }
 }
+
+void States::run_standby_function() {
+    std::cout << "Running standby function." << std::endl;
+    std::string mode = "standby";
+    double threshold = ledController_.get_max_distance();
+    apiClient_.send_post_request(apiClient_.create_request(0.0, 0.0, threshold, mode));
+    ledController_.clear();
+}

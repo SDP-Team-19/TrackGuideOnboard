@@ -194,7 +194,7 @@ void TCPServer::handle_client(int client_socket, std::atomic<bool>& shutdown_req
             states_.run_reset_function();
         } else if (shared_memory_->state == SystemState::STANDBY)
         {
-            ledController_.clear();
+            states_.run_standby_function();
         }
 
         // Release the semaphore after accessing shared memory

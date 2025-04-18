@@ -12,6 +12,7 @@ public:
     void run_record_function(const char* content);
     void run_play_function(const char* content);
     void run_reset_function();
+    void run_standby_function();
 private:
     LEDControl ledController_;
     BoundaryLogic& boundaryLogic_;
