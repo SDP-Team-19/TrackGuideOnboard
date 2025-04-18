@@ -17,7 +17,6 @@ private:
     BoundaryLogic& boundaryLogic_;
     bool track_loaded_;  // Flag to indicate whether the track has been loaded
     bool is_recording_;
-    bool is_playing_;
     ApiClient& apiClient_;
     std::mutex file_mutex;
 };

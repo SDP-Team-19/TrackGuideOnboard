@@ -40,7 +40,6 @@ typedef nanoflann::KDTreeSingleIndexAdaptor<
 class BoundaryLogic {
 public:
     // Constructors
-    BoundaryLogic(double threshold);
     BoundaryLogic();
 
     // Default move constructor and move assignment operator
@@ -55,7 +54,6 @@ public:
 private:
     double computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next);
 
-    double _threshold;
     std::vector<Point2D> recorded_path;
     std::unique_ptr<KDTree> _kdtree_ptr;
     std::unique_ptr<PointCloud> _point_cloud_ptr;

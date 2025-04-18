@@ -19,18 +19,12 @@ ApiClient::~ApiClient() {
 }
 
 // Create a JSON request with latitude and longitude
-nlohmann::json ApiClient::create_location_request(double latitude, double longitude) {
+nlohmann::json ApiClient::create_request(double latitude, double longitude, double threshold, const std::string& mode) {
     nlohmann::json request;
+    request["mode"] = mode;
+    request["threshold"] = threshold;
     request["latitude"] = latitude;
     request["longitude"] = longitude;
-    return request;
-}
-
-// Create a JSON request with threshold and mode
-nlohmann::json ApiClient::create_mode_request(double threshold, const std::string& mode) {
-    nlohmann::json request;
-    request["threshold"] = threshold;
-    request["mode"] = mode;
     return request;
 }
 

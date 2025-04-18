@@ -78,7 +78,7 @@ int main() {
     Buttons buttons(16, 20, 21, shared_memory, semaphore);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
-    BoundaryLogic boundary_logic(threshold);
+    BoundaryLogic boundary_logic();
     ApiClient api_client;
     States states(led_control, boundary_logic, api_client);
 

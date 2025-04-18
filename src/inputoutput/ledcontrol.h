@@ -41,6 +41,7 @@ public:
     void set_led_location(double distance, ws2811_led_t color, int pixel_width = 3);
     ws2811_led_t map_color(Color color);
     void led_location_bounce_animation(Color color, int pixel_width);
+    double get_max_distance() const { return _maxDistance; }
 
 private:
     uint16_t _stripLength;
