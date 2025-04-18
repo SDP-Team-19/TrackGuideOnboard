@@ -5,12 +5,13 @@
 #include <fstream>
 #include <mutex>
 
-States::States(LEDControl ledController, BoundaryLogic& boundaryLogic)
-    : ledController_(ledController), boundaryLogic_(boundaryLogic), track_loaded_(false), is_recording_(false) {
+States::States(LEDControl ledController, BoundaryLogic& boundaryLogic, ApiClient& apiClient)
+    : ledController_(ledController), boundaryLogic_(boundaryLogic), apiClient_(apiClient), track_loaded_(false), is_recording_(false), is_playing_(false) {
 }
 
 void States::run_record_function(const char* content) {
     track_loaded_ = false;
+    is_playing_ = false;
     // Implement the function you want to run in a new process
     std::cout << "Running record function in a new process." << std::endl;
 
@@ -19,6 +20,11 @@ void States::run_record_function(const char* content) {
     if (!is_recording_)
     {
         ledController_.indicate_record_startup();
+        std::string mode = "record";
+        double threshold = boundaryLogic_.get_threshold();
+        nlohmann::json mode_request = apiClient_.create_mode_request(threshold, mode);
+        std::string response = apiClient_.sendPostRequest(mode_request);
+        std::cout << "Response from server: " << response << std::endl;
         is_recording_ = true;
     }
 
@@ -27,6 +33,7 @@ void States::run_record_function(const char* content) {
     double latitude, longitude;
 
     iss >> date >> time >> latitude >> longitude;
+    apiClient_.sendPostRequest(apiClient_.createLocationRequest(latitude, longitude));
     // kinesisStream_.sendPositionData(latitude, longitude);
 
     // Use a mutex to avoid race conditions when writing to the file
@@ -65,12 +72,23 @@ void States::run_play_function(const char* content) {
         track_loaded_ = boundaryLogic_.load_track("coordinates.csv");
     }
 
+    if(!is_playing_)
+    {
+        std::string mode = "play";
+        double threshold = boundaryLogic_.get_threshold();
+        nlohmann::json mode_request = apiClient_.create_mode_request(threshold, mode);
+        std::string response = apiClient_.sendPostRequest(mode_request);
+        std::cout << "Response from server: " << response << std::endl;
+        is_playing_ = true;
+    }
+
     // Calculate the distance
     try {
         if(track_loaded_){
             double distance = boundaryLogic_.calculate_distance(latitude, longitude);
             std::cout << "Distance from track (cm): " << distance << std::endl;
             ledController_.set_led_location(distance, ledController_.map_color(Color::RED), 3);
+            apiClient_.sendPostRequest(apiClient_.createLocationRequest(latitude, longitude));
         }
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;
@@ -80,6 +98,7 @@ void States::run_play_function(const char* content) {
 void States::run_reset_function() {
     std::lock_guard<std::mutex> lock(file_mutex);
     is_recording_ = false;
+    is_playing_ = false;
     if (remove("coordinates.csv") != 0) {
         std::cout << "Could not delete coordinates.csv" << std::endl;
     } else {

@@ -27,33 +27,33 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     double queryPt[2] = {userPos.x, userPos.y};
     size_t nearestIdx;
     double outDistSqr;
-    std::cout << "initialized calc variables" << std::endl;
+    // std::cout << "initialized calc variables" << std::endl;
 
     if (recorded_path.empty()) {
         throw std::runtime_error("Recorded path is empty.");
     }
 
     resultSet.init(&nearestIdx, &outDistSqr);
-    std::cout << "initialized result set" << std::endl;
+    // std::cout << "initialized result set" << std::endl;
     SearchParameters params;
     params.sorted = false;
     params.eps = 0.0;
-    std::cout << "finding neighbors" << std::endl;
+    // std::cout << "finding neighbors" << std::endl;
     if (!_kdtree_ptr)
     {
         std::cout << "_kdtree_ptr uninitialized" << std::endl;
     }
     _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
-    std::cout << "neighbors found" << std::endl;
+    // std::cout << "neighbors found" << std::endl;
 
     size_t nextIdx;
     if (!_point_cloud_ptr) {
         throw std::runtime_error("uninitialized point cloud.");
     }
-    for (const auto& point : _point_cloud_ptr->points) {
-        std::cout << "Latitude: " << point.x << ", Longitude: " << point.y << std::endl;
-    }
-    cout << "point cloud pointer is initialized" << endl;
+    // for (const auto& point : _point_cloud_ptr->points) {
+    //     std::cout << "Latitude: " << point.x << ", Longitude: " << point.y << std::endl;
+    // }
+    // cout << "point cloud pointer is initialized" << endl;
 
     if (nearestIdx == 0) {
         nextIdx = 1;
@@ -62,12 +62,12 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     } else {
         nextIdx = nearestIdx + 1;
     }
-    std::cout << "next index found" << std::endl;
+    // std::cout << "next index found" << std::endl;
 
-    std::cout << "computing signed perp distance" << std::endl;
+    // std::cout << "computing signed perp distance" << std::endl;
     double signedPerpDist = computeSignedPerpendicularDistance(userPos, _point_cloud_ptr->points[nearestIdx], _point_cloud_ptr->points[nextIdx]);
 
-    std::cout << "distance found" << std::endl;
+    // std::cout << "distance found" << std::endl;
     return signedPerpDist;
 }
 
