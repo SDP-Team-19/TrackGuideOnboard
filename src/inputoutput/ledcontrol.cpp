@@ -278,6 +278,7 @@ void LEDControl::test_interpolate(double distance, Color startColor, Color endCo
 
 
 void LEDControl::clear() {
+    std::cout << "Clearing LED strip" << std::endl;
     for (int i = 0; i < _stripLength; ++i) {
         _ledstring.channel[1].leds[i] = 0x00000000;
     }
