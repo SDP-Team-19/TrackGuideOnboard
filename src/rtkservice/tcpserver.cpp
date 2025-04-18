@@ -35,7 +35,7 @@ std::ostream& operator<<(std::ostream& os, const SystemState& state) {
 #define SEM_NAME "/tcpserver_sem"
 #define SHM_SIZE sizeof(SharedMemory)
 
-TCPServer::TCPServer(int port, LEDControl led_controller, States& states, SharedMemory* shared_memory, sem_t* semaphore) 
+TCPServer::TCPServer(int port, LEDControl& led_controller, States& states, SharedMemory* shared_memory, sem_t* semaphore) 
     : ledController_(led_controller), states_(states), shared_memory_(shared_memory), semaphore_(semaphore) {
     // Create a socket
     serverSocket_ = socket(AF_INET, SOCK_STREAM, 0);

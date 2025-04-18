@@ -5,7 +5,7 @@
 #include <fstream>
 #include <mutex>
 
-States::States(LEDControl ledController, BoundaryLogic& boundaryLogic, ApiClient& apiClient)
+States::States(LEDControl& ledController, BoundaryLogic& boundaryLogic, ApiClient& apiClient)
     : ledController_(ledController), boundaryLogic_(boundaryLogic), apiClient_(apiClient), track_loaded_(false), is_recording_(false){
 }
 

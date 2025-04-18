@@ -7,7 +7,7 @@
 
 class States {
 public:
-    States(LEDControl ledController, BoundaryLogic& boundaryLogic, ApiClient& apiClient);
+    States(LEDControl& ledController, BoundaryLogic& boundaryLogic, ApiClient& apiClient);
     
     void run_record_function(const char* content);
     void run_play_function(const char* content);

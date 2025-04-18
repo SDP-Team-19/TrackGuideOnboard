@@ -28,13 +28,13 @@ struct SharedMemory;
 
 class TCPServer {
 public:
-    TCPServer(int port, LEDControl ledController, States& states, SharedMemory* shared_memory, sem_t* semaphore);
+    TCPServer(int port, LEDControl& ledController, States& states, SharedMemory* shared_memory, sem_t* semaphore);
     ~TCPServer();
     void start(std::atomic<bool>& shutdown_requested);
 
 private:
     int serverSocket_;
-    LEDControl ledController_;
+    LEDControl& ledController_;
     States& states_;
     struct sockaddr_in serverAddr_;
 
