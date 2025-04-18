@@ -7,11 +7,8 @@
 using namespace std;
 using namespace nanoflann;
 
-// Constructor that initializes max_distance
-BoundaryLogic::BoundaryLogic() :  _point_cloud_ptr(std::make_unique<PointCloud>()), 
-_kdtree_ptr(std::make_unique<KDTree>(2, *_point_cloud_ptr)) {
-    _point_cloud_ptr->points.clear(); // Initialize the points member
-}
+// Default constructor
+BoundaryLogic::BoundaryLogic(){}
 
 // Function to calculate distance given latitude and longitude
 double BoundaryLogic::calculate_distance(double latitude, double longitude) {
