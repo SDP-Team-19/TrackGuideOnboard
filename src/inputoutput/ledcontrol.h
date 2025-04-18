@@ -42,6 +42,7 @@ public:
     ws2811_led_t map_color(Color color);
     void led_location_bounce_animation(Color color, int pixel_width);
     double get_max_distance() const { return _maxDistance; }
+    double get_max_distance_as_lat_long_deg() const { return _maxDistance * 0.00000008983; } // Convert from cm to lat/long degrees
 
 private:
     uint16_t _stripLength;

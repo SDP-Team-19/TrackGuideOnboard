@@ -28,7 +28,7 @@ void States::run_record_function(const char* content) {
 
     iss >> date >> time >> latitude >> longitude;
     std::string mode = "record";
-    double threshold = ledController_.get_max_distance();
+    double threshold = ledController_.get_max_distance_as_lat_long_deg();
     apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
     // kinesisStream_.sendPositionData(latitude, longitude);
 
@@ -75,7 +75,7 @@ void States::run_play_function(const char* content) {
             std::cout << "Distance from track (cm): " << distance << std::endl;
             ledController_.set_led_location(distance, ledController_.map_color(Color::RED), 3);
             std::string mode = "play";
-            double threshold = ledController_.get_max_distance();
+            double threshold = ledController_.get_max_distance_as_lat_long_deg();
             apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
         }
     } catch (const std::exception& e) {
@@ -96,7 +96,7 @@ void States::run_reset_function() {
 void States::run_standby_function() {
     std::cout << "Running standby function." << std::endl;
     std::string mode = "standby";
-    double threshold = ledController_.get_max_distance();
+    double threshold = ledController_.get_max_distance_as_lat_long_deg();
     apiClient_.send_post_request(apiClient_.create_request(0.0, 0.0, threshold, mode));
     ledController_.clear();
 }
