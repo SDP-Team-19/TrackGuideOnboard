@@ -77,7 +77,8 @@ int main() {
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
     BoundaryLogic boundary_logic;
-    States states(led_control, boundary_logic);
+    ApiClient api_client;
+    States states(led_control, boundary_logic, api_client);
 
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
     rtk_service_ptr = &rtk_service;
