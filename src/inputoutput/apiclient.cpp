@@ -31,7 +31,7 @@ nlohmann::json ApiClient::create_request(double latitude, double longitude, doub
 std::string ApiClient::send_post_request(const nlohmann::json& jsonData) {
     std::string responseString;
 
-    std::coud << "sending the message: " << jsonData.dump() << std::endl;
+    std::cout << "sending the message: " << jsonData.dump() << std::endl;
 
     curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");
