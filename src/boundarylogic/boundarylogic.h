@@ -49,7 +49,6 @@ public:
     // Member functions
     double calculate_distance(double latitude, double longitude);
     bool load_track(const std::string& file_path);
-    double get_threshold() const { return _threshold; }
 
 private:
     double computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next);
