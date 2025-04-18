@@ -19,7 +19,7 @@ ApiClient::~ApiClient() {
 }
 
 // Create a JSON request with latitude and longitude
-nlohmann::json ApiClient::create_location_request(float latitude, float longitude) {
+nlohmann::json ApiClient::create_location_request(double latitude, double longitude) {
     nlohmann::json request;
     request["latitude"] = latitude;
     request["longitude"] = longitude;
@@ -27,7 +27,7 @@ nlohmann::json ApiClient::create_location_request(float latitude, float longitud
 }
 
 // Create a JSON request with threshold and mode
-nlohmann::json ApiClient::create_mode_request(float threshold, const std::string& mode) {
+nlohmann::json ApiClient::create_mode_request(double threshold, const std::string& mode) {
     nlohmann::json request;
     request["threshold"] = threshold;
     request["mode"] = mode;
@@ -36,6 +36,8 @@ nlohmann::json ApiClient::create_mode_request(float threshold, const std::string
 
 std::string ApiClient::send_post_request(const nlohmann::json& jsonData) {
     std::string responseString;
+
+    std::coud << "sending the message: " << jsonData.dump() << std::endl;
 
     curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
     curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");

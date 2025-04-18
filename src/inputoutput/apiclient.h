@@ -17,10 +17,10 @@ public:
     ~ApiClient();
 
     // Create a JSON request with latitude and longitude
-    nlohmann::json create_location_request(float latitude, float longitude);
+    nlohmann::json create_location_request(double latitude, double longitude);
 
     // Create a JSON request with threshold and mode
-    nlohmann::json create_mode_request(float threshold, const std::string& mode);
+    nlohmann::json create_mode_request(double threshold, const std::string& mode);
 
     // Send a JSON request to the server and return the response
     std::string send_post_request(const nlohmann::json& requestBody);
