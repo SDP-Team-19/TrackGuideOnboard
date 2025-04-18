@@ -66,7 +66,9 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    LEDControl led_control(19, 27, 100.0, 5.0, 5.0);
+    double threshold = 100.0;
+
+    LEDControl led_control(19, 27, threshold, 5.0, 5.0);
     led_control_ptr = &led_control;
     led_control_ptr->led_location_bounce_animation(Color::GREEN, 3);
     usleep(1000000);
@@ -76,7 +78,7 @@ int main() {
     Buttons buttons(16, 20, 21, shared_memory, semaphore);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
 
-    BoundaryLogic boundary_logic;
+    BoundaryLogic boundary_logic(threshold);
     ApiClient api_client;
     States states(led_control, boundary_logic, api_client);
 
