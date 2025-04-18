@@ -113,7 +113,7 @@ int main() {
 
     // ApiClient api_client;
     // while (!shutdown_requested.load(std::memory_order_acquire)) {
-    //     nlohmann::json location_request = api_client.createLocationRequest(37.7749, -122.4194);
+    //     nlohmann::json location_request = api_client.create_location_request(37.7749, -122.4194);
     //     nlohmann::json mode_request = api_client.createModeRequest(0.5, "test_mode");
     //     nlohmann::json location_response = api_client.sendPostRequest(location_request);
     //     // nlohmann::json mode_response = api_client.sendPostRequest("frontend-computer:8081", mode_request);

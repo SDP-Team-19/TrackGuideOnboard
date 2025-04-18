@@ -17,19 +17,19 @@ public:
     ~ApiClient();
 
     // Create a JSON request with latitude and longitude
-    nlohmann::json createLocationRequest(float latitude, float longitude);
+    nlohmann::json create_location_request(float latitude, float longitude);
 
     // Create a JSON request with threshold and mode
-    nlohmann::json createModeRequest(float threshold, const std::string& mode);
+    nlohmann::json create_mode_request(float threshold, const std::string& mode);
 
     // Send a JSON request to the server and return the response
-    std::string sendPostRequest(const nlohmann::json& requestBody);
+    std::string send_post_request(const nlohmann::json& requestBody);
 
 private:
 
     CURL* curlHandle;
 
-    static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp);
+    static size_t write_callback(void* contents, size_t size, size_t nmemb, std::string* userp);
 
 };
 

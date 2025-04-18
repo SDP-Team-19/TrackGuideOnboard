@@ -23,7 +23,7 @@ void States::run_record_function(const char* content) {
         std::string mode = "record";
         double threshold = boundaryLogic_.get_threshold();
         nlohmann::json mode_request = apiClient_.create_mode_request(threshold, mode);
-        std::string response = apiClient_.sendPostRequest(mode_request);
+        std::string response = apiClient_.send_post_request(mode_request);
         std::cout << "Response from server: " << response << std::endl;
         is_recording_ = true;
     }
@@ -33,7 +33,7 @@ void States::run_record_function(const char* content) {
     double latitude, longitude;
 
     iss >> date >> time >> latitude >> longitude;
-    apiClient_.sendPostRequest(apiClient_.createLocationRequest(latitude, longitude));
+    apiClient_.send_post_request(apiClient_.create_location_request(latitude, longitude));
     // kinesisStream_.sendPositionData(latitude, longitude);
 
     // Use a mutex to avoid race conditions when writing to the file
@@ -77,7 +77,7 @@ void States::run_play_function(const char* content) {
         std::string mode = "play";
         double threshold = boundaryLogic_.get_threshold();
         nlohmann::json mode_request = apiClient_.create_mode_request(threshold, mode);
-        std::string response = apiClient_.sendPostRequest(mode_request);
+        std::string response = apiClient_.send_post_request(mode_request);
         std::cout << "Response from server: " << response << std::endl;
         is_playing_ = true;
     }
@@ -88,7 +88,7 @@ void States::run_play_function(const char* content) {
             double distance = boundaryLogic_.calculate_distance(latitude, longitude);
             std::cout << "Distance from track (cm): " << distance << std::endl;
             ledController_.set_led_location(distance, ledController_.map_color(Color::RED), 3);
-            apiClient_.sendPostRequest(apiClient_.createLocationRequest(latitude, longitude));
+            apiClient_.send_post_request(apiClient_.create_location_request(latitude, longitude));
         }
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;

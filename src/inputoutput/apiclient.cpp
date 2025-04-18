@@ -19,7 +19,7 @@ ApiClient::~ApiClient() {
 }
 
 // Create a JSON request with latitude and longitude
-nlohmann::json ApiClient::createLocationRequest(float latitude, float longitude) {
+nlohmann::json ApiClient::create_location_request(float latitude, float longitude) {
     nlohmann::json request;
     request["type"] = "location";
     request["data"]["latitude"] = latitude;
@@ -28,7 +28,7 @@ nlohmann::json ApiClient::createLocationRequest(float latitude, float longitude)
 }
 
 // Create a JSON request with threshold and mode
-nlohmann::json ApiClient::createModeRequest(float threshold, const std::string& mode) {
+nlohmann::json ApiClient::create_mode_request(float threshold, const std::string& mode) {
     nlohmann::json request;
     request["type"] = "mode";
     request["data"]["threshold"] = threshold;
@@ -36,7 +36,7 @@ nlohmann::json ApiClient::createModeRequest(float threshold, const std::string& 
     return request;
 }
 
-std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
+std::string ApiClient::send_post_request(const nlohmann::json& jsonData) {
     std::string responseString;
 
     curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
@@ -44,7 +44,7 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseString);
     
     std::string jsonString = jsonData.dump();
@@ -62,7 +62,7 @@ std::string ApiClient::sendPostRequest(const nlohmann::json& jsonData) {
 }
 
 
-size_t ApiClient::WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {
+size_t ApiClient::write_callback(void* contents, size_t size, size_t nmemb, std::string* userp) {
     size_t totalSize = size * nmemb;
     userp->append((char*)contents, totalSize);
     return totalSize;
