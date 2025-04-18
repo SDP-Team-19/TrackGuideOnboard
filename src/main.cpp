@@ -77,14 +77,17 @@ int main() {
     // Test different distances from 0.0 to 1.0
     Buttons buttons(16, 20, 21, shared_memory, semaphore);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
+    std::cout << "Button thread started" << std::endl;
 
     BoundaryLogic boundary_logic;
     ApiClient api_client;
     States states(led_control, boundary_logic, api_client);
+    std::cout << "States initialized" << std::endl;
 
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
     rtk_service_ptr = &rtk_service;
     rtk_service.start_server();
+    std::cout << "RTK server started" << std::endl;
     
     TCPServer server(PORT, led_control, states, shared_memory, semaphore);
     server.start(shutdown_requested);
