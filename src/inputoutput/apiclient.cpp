@@ -28,9 +28,7 @@ nlohmann::json ApiClient::create_request(double latitude, double longitude, doub
     return request;
 }
 
-std::string ApiClient::send_post_request(const nlohmann::json& jsonData) {
-    std::string responseString;
-
+void ApiClient::send_post_request(const nlohmann::json& jsonData) {
     std::cout << "sending the message: " << jsonData.dump() << std::endl;
 
     curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
@@ -38,21 +36,12 @@ std::string ApiClient::send_post_request(const nlohmann::json& jsonData) {
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/json");
     curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(curlHandle, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curlHandle, CURLOPT_WRITEDATA, &responseString);
     
     std::string jsonString = jsonData.dump();
     curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
 
-
-    CURLcode response = curl_easy_perform(curlHandle);
-    if (response != CURLE_OK) {
-        std::cerr << "CURL error: " << curl_easy_strerror(response) << std::endl;
-    }
-
-    curl_slist_free_all(headers); // Free the headers list
-
-    return responseString;
+    curl_easy_perform(curlHandle);
+    curl_slist_free_all(headers);
 }
 
 
