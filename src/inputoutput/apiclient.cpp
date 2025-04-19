@@ -28,20 +28,28 @@ nlohmann::json ApiClient::create_request(double latitude, double longitude, doub
     return request;
 }
 
-void ApiClient::send_post_request(const nlohmann::json& jsonData) {
-    std::cout << "sending the message: " << jsonData.dump() << std::endl;
+std::future<void> ApiClient::send_post_request(const nlohmann::json& jsonData) {
+    return std::async(std::launch::async, [this, jsonData]() {
+        std::cout << "sending the message: " << jsonData.dump() << std::endl;
 
-    curl_easy_setopt(curlHandle, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");
-    struct curl_slist* headers = NULL;
-    headers = curl_slist_append(headers, "Content-Type: application/json");
-    curl_easy_setopt(curlHandle, CURLOPT_HTTPHEADER, headers);
-    
-    std::string jsonString = jsonData.dump();
-    curl_easy_setopt(curlHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
+        CURL* localHandle = curl_easy_init();
+        if (!localHandle) {
+            throw std::runtime_error("Failed to initialize CURL");
+        }
 
-    curl_easy_perform(curlHandle);
-    curl_slist_free_all(headers);
+        curl_easy_setopt(localHandle, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_easy_setopt(localHandle, CURLOPT_URL, "http://frontend-computer:8081");
+        struct curl_slist* headers = NULL;
+        headers = curl_slist_append(headers, "Content-Type: application/json");
+        curl_easy_setopt(localHandle, CURLOPT_HTTPHEADER, headers);
+        
+        std::string jsonString = jsonData.dump();
+        curl_easy_setopt(localHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
+
+        curl_easy_perform(localHandle);
+        curl_slist_free_all(headers);
+        curl_easy_cleanup(localHandle);
+    });
 }
 
 
