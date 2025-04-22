@@ -84,17 +84,18 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
     socklen_t sin_size = sizeof(struct sockaddr_in);
     int client_socket;
     std::future<void> animation_future;
+    std::atomic<bool> stop_animation(false);
 
     // Start animation in background
-    // auto run_animation = [&shutdown_requested, this]() {
-    //     while (!shutdown_requested.load(std::memory_order_acquire)) {
-    //         ledController_.led_location_bounce_animation(Color::BLUE, 3);
-    //         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    //     }
-    // };
+    auto run_animation = [&stop_animation, this]() {
+        while (!stop_animation.load(std::memory_order_acquire)) {
+            ledController_.led_location_bounce_animation(Color::BLUE, 3);
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+    };
 
-    // // Start animation immediately
-    // animation_future = std::async(std::launch::async, run_animation);
+    // Start animation immediately
+    animation_future = std::async(std::launch::async, run_animation);
 
     // Main loop to accept and handle client connections
     while (!shutdown_requested.load(std::memory_order_acquire)) {
@@ -111,13 +112,13 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
             return;
         }
 
-        // if (activity == 0) {
-        //     // If no connection and animation isn't running, restart it
-        //     if (!animation_future.valid()) {
-        //         animation_future = std::async(std::launch::async, run_animation);
-        //     }
-        //     continue;
-        // }
+        if (activity == 0) {
+            // If no connection and animation isn't running, restart it
+            if (!animation_future.valid()) {
+                animation_future = std::async(std::launch::async, run_animation);
+            }
+            continue;
+        }
 
         client_socket = accept(serverSocket_, (struct sockaddr *)&client_addr, &sin_size);
 
@@ -145,21 +146,26 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
             std::cout << "Startup message received from server" << std::endl;
             close(client_socket);
         } else {
-            // if (animation_future.valid()) {
-            //     animation_future = std::future<void>();
-            // }
+            if (animation_future.valid()) {
+                stop_animation.store(true, std::memory_order_release);
+                animation_future.wait(); // Wait for the animation thread to complete
+                animation_future = std::future<void>();
+            }
             handle_client(client_socket, shutdown_requested);
         }
     }
 
     // Ensure animation thread is stopped
-    // if (animation_future.valid()) {
-    //     animation_future = std::future<void>();
-    // }
+    if (animation_future.valid()) {
+        stop_animation.store(true, std::memory_order_release);
+        animation_future.wait(); // Wait for the animation thread to complete
+        animation_future = std::future<void>();
+    }
     ledController_.clear();
     std::cout << "Server shutting down..." << std::endl;
     close_server();
 }
+
 
 void TCPServer::handle_client(int client_socket, std::atomic<bool>& shutdown_requested) {
     char buffer[BUFFER_SIZE];
