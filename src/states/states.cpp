@@ -26,6 +26,8 @@ void States::run_record_function(const char* content) {
     std::string date, time;
     double latitude, longitude;
 
+    std::cout << "Content stream: " << content << std::endl;
+
     iss >> date >> time >> latitude >> longitude;
     std::string mode = "record";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
