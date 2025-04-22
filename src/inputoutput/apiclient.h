@@ -5,8 +5,9 @@
 #include <curl/curl.h>
 #include <stdexcept>
 #include <sstream>
-#include <iostream> // Add this line
-#include <nlohmann/json.hpp> // Include the JSON library (https://github.com/nlohmann/json)
+#include <iostream>
+#include <future>
+#include <nlohmann/json.hpp>
 
 class ApiClient {
 public:
