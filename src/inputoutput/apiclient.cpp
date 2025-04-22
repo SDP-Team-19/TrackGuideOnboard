@@ -39,6 +39,7 @@ std::future<void> ApiClient::send_post_request(const nlohmann::json& jsonData) {
 
         curl_easy_setopt(localHandle, CURLOPT_CUSTOMREQUEST, "POST");
         curl_easy_setopt(localHandle, CURLOPT_URL, "http://frontend-computer:8081");
+        curl_easy_setopt(localHandle, CURLOPT_TIMEOUT, 1L); // 1 second timeout
         struct curl_slist* headers = NULL;
         headers = curl_slist_append(headers, "Content-Type: application/json");
         curl_easy_setopt(localHandle, CURLOPT_HTTPHEADER, headers);
