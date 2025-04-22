@@ -31,7 +31,9 @@ void States::run_record_function(const char* content) {
     iss >> date >> time >> latitude >> longitude;
     std::string mode = "record";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
-    apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
+    std::async(std::launch::async, [&]() {
+        apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
+    });
     // kinesisStream_.sendPositionData(latitude, longitude);
 
     // Use a mutex to avoid race conditions when writing to the file
@@ -78,7 +80,9 @@ void States::run_play_function(const char* content) {
             ledController_.set_led_location(distance, ledController_.map_color(Color::RED), 3);
             std::string mode = "play";
             double threshold = ledController_.get_max_distance_as_lat_long_deg();
-            apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
+            std::async(std::launch::async, [&]() {
+                apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
+            });
         }
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;
@@ -99,6 +103,8 @@ void States::run_standby_function() {
     std::cout << "Running standby function." << std::endl;
     std::string mode = "standby";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
-    apiClient_.send_post_request(apiClient_.create_request(0.0, 0.0, threshold, mode));
+    std::async(std::launch::async, [&]() {
+        apiClient_.send_post_request(apiClient_.create_request(0.0, 0.0, threshold, mode));
+    });
     ledController_.clear();
 }
