@@ -64,6 +64,8 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     return signedPerpDist;
 }
 
+
+
 // Function to load track from a saved CSV file
 bool BoundaryLogic::load_track(const std::string& file_path) {
     // std::cout << "Locking mutex for loading track" << std::endl;

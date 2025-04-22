@@ -24,11 +24,10 @@ void States::run_record_function(const char* content) {
 
     std::istringstream iss(content);
     std::string date, time;
-    double latitude, longitude;
+    int stats, fix;
+    double latitude, longitude, altitude, speed, heading, pdop, hdop, vdop, veast, vnorth, vdown;
 
-    std::cout << "Content stream: " << content << std::endl;
-
-    iss >> date >> time >> latitude >> longitude;
+    iss >> date >> time >> latitude >> longitude >> altitude >> stats >> fix >> pdop >> hdop >> vdop >> vnorth >> veast  >> vdown >> speed >> heading;
     std::string mode = "record";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
     std::async(std::launch::async, [&]() {
@@ -49,7 +48,7 @@ void States::run_record_function(const char* content) {
     outfile << std::fixed;
 
     // Write the latitude and longitude to the CSV file
-    outfile << latitude << ", " << longitude << std::endl;
+    outfile << latitude << ", " << longitude  << ", " << speed << std::endl;
 
     // Close the file
     outfile.close();
@@ -62,9 +61,10 @@ void States::run_play_function(const char* content) {
     is_recording_ = false;
     std::istringstream iss(content);
     std::string date, time;
-    double latitude, longitude;
+    int stats, fix;
+    double latitude, longitude, altitude, speed, heading, pdop, hdop, vdop, veast, vnorth, vdown;
 
-    iss >> date >> time >> latitude >> longitude;
+    iss >> date >> time >> latitude >> longitude >> altitude >> stats >> fix >> pdop >> hdop >> vdop >> vnorth >> veast  >> vdown >> speed >> heading;
     // kinesisStream_.sendPositionData(latitude, longitude);
 
     if (!track_loaded_) {
