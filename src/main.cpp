@@ -74,7 +74,7 @@ int main() {
     ApiClient api_client;
     States states(led_control, boundary_logic, api_client);
     std::cout << "States initialized" << std::endl;
-    while (!api_client.check_wifi_connection() && !shutdown_requested.load()) {
+    while (api_client.check_wifi_connection() == false && !shutdown_requested.load(std::memory_order_acquire)){
         led_control_ptr->led_location_bounce_animation(Color::GREEN, 3);
     }
     usleep(1000000);
