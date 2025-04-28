@@ -70,14 +70,6 @@ int main() {
 
     LEDControl led_control(19, 27, threshold, 5.0, 5.0);
     led_control_ptr = &led_control;
-    ApiClient api_client;
-    std::cout << "States initialized" << std::endl;
-    while (!api_client.check_wifi_connection() && !shutdown_requested.load(std::memory_order_acquire)) {
-        led_control.led_location_bounce_animation(Color::RED, 3);
-        std::cout << "No WiFi connection. Please check your connection." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-    led_control_ptr->clear();
 
     // Test different distances from 0.0 to 1.0
     Buttons buttons(16, 20, 21, shared_memory, semaphore);
@@ -88,6 +80,15 @@ int main() {
     rtk_service_ptr = &rtk_service;
     rtk_service.start_server();
     std::cout << "RTK server started" << std::endl;
+
+    ApiClient api_client;
+    std::cout << "States initialized" << std::endl;
+    while (!api_client.check_wifi_connection() && !shutdown_requested.load(std::memory_order_acquire)) {
+        led_control.led_location_bounce_animation(Color::RED, 3);
+        std::cout << "No WiFi connection. Please check your connection." << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    led_control_ptr->clear();
     
     BoundaryLogic boundary_logic;
     States states(led_control, boundary_logic, api_client);
