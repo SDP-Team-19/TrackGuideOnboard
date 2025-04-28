@@ -70,14 +70,12 @@ int main() {
 
     LEDControl led_control(19, 27, threshold, 5.0, 5.0);
     led_control_ptr = &led_control;
-    BoundaryLogic boundary_logic;
     ApiClient api_client;
-    States states(led_control, boundary_logic, api_client);
     std::cout << "States initialized" << std::endl;
-    while (api_client.check_wifi_connection() == false && !shutdown_requested.load(std::memory_order_acquire)){
-        led_control_ptr->led_location_bounce_animation(Color::GREEN, 3);
+    if (!api_client.check_wifi_connection()) {
+        led_control.led_location_bounce_animation(Color::GREEN, 3);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    usleep(1000000);
     led_control_ptr->clear();
 
     // Test different distances from 0.0 to 1.0
@@ -90,6 +88,8 @@ int main() {
     rtk_service.start_server();
     std::cout << "RTK server started" << std::endl;
     
+    BoundaryLogic boundary_logic;
+    States states(led_control, boundary_logic, api_client);
     TCPServer server(PORT, led_control, states, shared_memory, semaphore);
     server.start(shutdown_requested);
 
