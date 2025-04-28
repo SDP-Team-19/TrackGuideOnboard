@@ -70,6 +70,10 @@ int main() {
 
     LEDControl led_control(19, 27, threshold, 5.0, 5.0);
     led_control_ptr = &led_control;
+    BoundaryLogic boundary_logic;
+    ApiClient api_client;
+    States states(led_control, boundary_logic, api_client);
+    std::cout << "States initialized" << std::endl;
     while (!api_client.check_wifi_connection() && !shutdown_requested.load()) {
         led_control_ptr->led_location_bounce_animation(Color::GREEN, 3);
     }
@@ -80,11 +84,6 @@ int main() {
     Buttons buttons(16, 20, 21, shared_memory, semaphore);
     std::thread button_thread(&Buttons::monitor_button, &buttons, std::ref(shutdown_requested));
     std::cout << "Button thread started" << std::endl;
-
-    BoundaryLogic boundary_logic;
-    ApiClient api_client;
-    States states(led_control, boundary_logic, api_client);
-    std::cout << "States initialized" << std::endl;
 
     RTKService rtk_service("/home/team19/RTK_CONFIG/rtkrcv.conf");
     rtk_service_ptr = &rtk_service;
