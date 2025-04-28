@@ -73,7 +73,7 @@ int main() {
     ApiClient api_client;
     std::cout << "States initialized" << std::endl;
     if (!api_client.check_wifi_connection()) {
-        led_control.led_location_bounce_animation(Color::GREEN, 3);
+        led_control.led_location_bounce_animation(Color::RED, 3);
         std::cout << "No WiFi connection. Please check your connection." << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

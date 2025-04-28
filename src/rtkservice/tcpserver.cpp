@@ -147,10 +147,12 @@ void TCPServer::start(std::atomic<bool>& shutdown_requested) {
             close(client_socket);
         } else {
             if (animation_future.valid()) {
+                std::cout << "Stopping animation" << std::endl;
                 stop_animation.store(true, std::memory_order_release);
                 animation_future.wait(); // Wait for the animation thread to complete
                 animation_future = std::future<void>();
             }
+            std::cout << "Handling Client" << std::endl;
             handle_client(client_socket, shutdown_requested);
         }
     }
