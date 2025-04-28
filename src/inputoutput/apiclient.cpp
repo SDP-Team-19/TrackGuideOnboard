@@ -29,7 +29,7 @@ nlohmann::json ApiClient::create_request(double latitude, double longitude, doub
 }
 
 std::future<void> ApiClient::send_post_request(const nlohmann::json& jsonData) {
-    return std::async(std::launch::async, [this, jsonData]() {
+    return std::async(std::launch::async, [this, jsonData]() -> void {
         std::cout << "sending the message: " << jsonData.dump() << std::endl;
 
         std::unique_ptr<CURL, decltype(&curl_easy_cleanup)> localHandle(curl_easy_init(), curl_easy_cleanup);
@@ -50,7 +50,7 @@ std::future<void> ApiClient::send_post_request(const nlohmann::json& jsonData) {
         curl_easy_setopt(localHandle.get(), CURLOPT_NOSIGNAL, 1L);
 
         CURLcode result = curl_easy_perform(localHandle.get());
-        return result == CURLE_OK;
+        return;
     });
 }
 
