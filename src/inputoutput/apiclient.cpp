@@ -32,24 +32,25 @@ std::future<void> ApiClient::send_post_request(const nlohmann::json& jsonData) {
     return std::async(std::launch::async, [this, jsonData]() {
         std::cout << "sending the message: " << jsonData.dump() << std::endl;
 
-        CURL* localHandle = curl_easy_init();
+        std::unique_ptr<CURL, decltype(&curl_easy_cleanup)> localHandle(curl_easy_init(), curl_easy_cleanup);
         if (!localHandle) {
-            throw std::runtime_error("Failed to initialize CURL");
+            return false;
         }
+
+        std::unique_ptr<curl_slist, decltype(&curl_slist_free_all)> headers(nullptr, curl_slist_free_all);
+        headers.reset(curl_slist_append(nullptr, "Content-Type: application/json"));
+
+        std::string jsonString = jsonData.dump();
 
         curl_easy_setopt(localHandle, CURLOPT_CUSTOMREQUEST, "POST");
         curl_easy_setopt(localHandle, CURLOPT_URL, "http://frontend-computer:8081");
         curl_easy_setopt(localHandle, CURLOPT_TIMEOUT, 1L); // 1 second timeout
-        struct curl_slist* headers = NULL;
-        headers = curl_slist_append(headers, "Content-Type: application/json");
         curl_easy_setopt(localHandle, CURLOPT_HTTPHEADER, headers);
-        
-        std::string jsonString = jsonData.dump();
         curl_easy_setopt(localHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
+        curl_easy_setopt(localHandle.get(), CURLOPT_NOSIGNAL, 1L);
 
-        curl_easy_perform(localHandle);
-        curl_slist_free_all(headers);
-        curl_easy_cleanup(localHandle);
+        CURLcode result = curl_easy_perform(localHandle.get());
+        return result == CURLE_OK;
     });
 }
 

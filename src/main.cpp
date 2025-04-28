@@ -66,7 +66,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    double threshold = 100.0;
+    double threshold = 300.0;
 
     LEDControl led_control(19, 27, threshold, 5.0, 5.0);
     led_control_ptr = &led_control;
