@@ -21,7 +21,7 @@ public:
     nlohmann::json create_request(double latitude, double longitude, double threshold, const std::string& mode);
 
     // Send a JSON request to the server and return the response
-    std::future<void> send_post_request(const nlohmann::json& requestBody);
+    std::future<bool> send_post_request(const nlohmann::json& requestBody);
 
 private:
 
