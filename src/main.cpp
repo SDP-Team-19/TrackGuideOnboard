@@ -70,7 +70,9 @@ int main() {
 
     LEDControl led_control(19, 27, threshold, 5.0, 5.0);
     led_control_ptr = &led_control;
-    led_control_ptr->led_location_bounce_animation(Color::GREEN, 3);
+    while (!api_client.check_wifi_connection() && !shutdown_requested.load()) {
+        led_control_ptr->led_location_bounce_animation(Color::GREEN, 3);
+    }
     usleep(1000000);
     led_control_ptr->clear();
 

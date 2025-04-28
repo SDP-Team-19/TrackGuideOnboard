@@ -54,6 +54,18 @@ std::future<bool> ApiClient::send_post_request(const nlohmann::json& jsonData) {
     });
 }
 
+// Check if the WiFi connection is available
+bool ApiClient::check_wifi_connection() {
+    CURLcode res;
+    curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");
+    curl_easy_setopt(curlHandle, CURLOPT_TIMEOUT, 1L); // 1 second timeout
+    res = curl_easy_perform(curlHandle);
+    if (res != CURLE_OK) {
+        return false;
+    }
+    return true;
+}
+
 
 size_t ApiClient::write_callback(void* contents, size_t size, size_t nmemb, std::string* userp) {
     size_t totalSize = size * nmemb;

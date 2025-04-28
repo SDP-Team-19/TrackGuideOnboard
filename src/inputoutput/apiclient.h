@@ -23,6 +23,9 @@ public:
     // Send a JSON request to the server and return the response
     std::future<bool> send_post_request(const nlohmann::json& requestBody);
 
+    // Check if the WiFi connection is available
+    bool check_wifi_connection();
+
 private:
 
     CURL* curlHandle;
