@@ -28,8 +28,8 @@ nlohmann::json ApiClient::create_request(double latitude, double longitude, doub
     return request;
 }
 
-std::future<void> ApiClient::send_post_request(const nlohmann::json& jsonData) {
-    return std::async(std::launch::async, [this, jsonData]() -> void {
+std::future<bool> ApiClient::send_post_request(const nlohmann::json& jsonData) {
+    return std::async(std::launch::async, [this, jsonData]() {
         std::cout << "sending the message: " << jsonData.dump() << std::endl;
 
         std::unique_ptr<CURL, decltype(&curl_easy_cleanup)> localHandle(curl_easy_init(), curl_easy_cleanup);
@@ -42,15 +42,15 @@ std::future<void> ApiClient::send_post_request(const nlohmann::json& jsonData) {
 
         std::string jsonString = jsonData.dump();
 
-        curl_easy_setopt(localHandle, CURLOPT_CUSTOMREQUEST, "POST");
-        curl_easy_setopt(localHandle, CURLOPT_URL, "http://frontend-computer:8081");
-        curl_easy_setopt(localHandle, CURLOPT_TIMEOUT, 1L); // 1 second timeout
-        curl_easy_setopt(localHandle, CURLOPT_HTTPHEADER, headers);
-        curl_easy_setopt(localHandle, CURLOPT_POSTFIELDS, jsonString.c_str());
+        curl_easy_setopt(localHandle.get(), CURLOPT_CUSTOMREQUEST, "POST");
+        curl_easy_setopt(localHandle.get(), CURLOPT_URL, "http://frontend-computer:8081");
+        curl_easy_setopt(localHandle.get(), CURLOPT_TIMEOUT, 1L); // 1 second timeout
+        curl_easy_setopt(localHandle.get(), CURLOPT_HTTPHEADER, headers.get());
+        curl_easy_setopt(localHandle.get(), CURLOPT_POSTFIELDS, jsonString.c_str());
         curl_easy_setopt(localHandle.get(), CURLOPT_NOSIGNAL, 1L);
 
         CURLcode result = curl_easy_perform(localHandle.get());
-        return;
+        return result == CURLE_OK;
     });
 }
 
