@@ -72,7 +72,7 @@ int main() {
     led_control_ptr = &led_control;
     ApiClient api_client;
     std::cout << "States initialized" << std::endl;
-    while (!api_client.check_wifi_connection()) {
+    while (!api_client.check_wifi_connection() && !shutdown_requested.load(std::memory_order_acquire)) {
         led_control.led_location_bounce_animation(Color::RED, 3);
         std::cout << "No WiFi connection. Please check your connection." << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(1));

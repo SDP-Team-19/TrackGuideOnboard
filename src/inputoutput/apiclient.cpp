@@ -57,10 +57,11 @@ std::future<bool> ApiClient::send_post_request(const nlohmann::json& jsonData) {
 // Check if the WiFi connection is available
 bool ApiClient::check_wifi_connection() {
     CURLcode res;
-    curl_easy_setopt(curlHandle, CURLOPT_URL, "http://frontend-computer:8081");
+    curl_easy_setopt(curlHandle, CURLOPT_URL, "http://google.com");
     curl_easy_setopt(curlHandle, CURLOPT_TIMEOUT, 1L); // 1 second timeout
     res = curl_easy_perform(curlHandle);
     if (res != CURLE_OK) {
+        std::cerr << "CURL error: " << curl_easy_strerror(res) << std::endl;
         return false;
     }
     return true;
