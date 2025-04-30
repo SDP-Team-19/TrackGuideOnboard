@@ -65,34 +65,34 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
 }
 
 // Function to get the speed value at the nearest point on the track
-double BoundaryLogic::get_speed_at_nearest_point(double latitude, double longitude) {
-    KNNResultSet<double> resultSet(1);
-    double queryPt[2] = {latitude, longitude};
-    size_t nearestIdx;
-    double outDistSqr;
+// double BoundaryLogic::get_speed_at_nearest_point(double latitude, double longitude) {
+//     KNNResultSet<double> resultSet(1);
+//     double queryPt[2] = {latitude, longitude};
+//     size_t nearestIdx;
+//     double outDistSqr;
 
-    if (recorded_path.empty()) {
-        throw std::runtime_error("Recorded path is empty.");
-    }
+//     if (recorded_path.empty()) {
+//         throw std::runtime_error("Recorded path is empty.");
+//     }
 
-    resultSet.init(&nearestIdx, &outDistSqr);
-    SearchParameters params;
-    params.sorted = false;
-    params.eps = 0.0;
+//     resultSet.init(&nearestIdx, &outDistSqr);
+//     SearchParameters params;
+//     params.sorted = false;
+//     params.eps = 0.0;
 
-    if (!_kdtree_ptr) {
-        throw std::runtime_error("KD tree not initialized");
-    }
+//     if (!_kdtree_ptr) {
+//         throw std::runtime_error("KD tree not initialized");
+//     }
 
-    _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
+//     _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
     
-    // Return speed value at nearest point
-    if (nearestIdx < recorded_path.size() && recorded_path[nearestIdx].speed >= 0) {
-        return recorded_path[nearestIdx].speed;
-    }
+//     // Return speed value at nearest point
+//     if (nearestIdx < recorded_path.size() && recorded_path[nearestIdx].speed >= 0) {
+//         return recorded_path[nearestIdx].speed;
+//     }
     
-    return -1; // Return -1 if no valid speed found
-}
+//     return -1; // Return -1 if no valid speed found
+// }
 
 
 
