@@ -30,7 +30,7 @@ void States::run_record_function(const char* content) {
     std::vector<std::string> tokens;
     std::string token;
     int stats, fix;
-    double latitude, longitude, speed;
+    double latitude, longitude;
 
     while (iss >> token) {
         tokens.push_back(token);
@@ -122,7 +122,7 @@ void States::run_play_function(const char* content) {
             double previous_speed = boundaryLogic_.get_speed_at_nearest_point(latitude, longitude);
             std::cout << "Speed at nearest point (m/s): " << previous_speed << std::endl;
             std::cout << "Distance from track (cm): " << distance << std::endl;
-            ws2811_led_t color = ledController_.map_color(Color::RED)
+            ws2811_led_t color = ledController_.map_color(Color::RED);
             if (previous_speed > 0) {
                 color = ledController_.get_interpolated_breaking_color(speed, previous_speed, Color::RED, Color::YELLOW, Color::GREEN);
             }
