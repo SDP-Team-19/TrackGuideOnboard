@@ -23,11 +23,21 @@ void States::run_record_function(const char* content) {
     }
 
     std::istringstream iss(content);
-    std::string date, time;
+    std::vector<std::string> tokens;
+    std::string token;
     int stats, fix;
-    double latitude, longitude, altitude, speed, heading, pdop, hdop, vdop, veast, vnorth, vdown;
+    double latitude, longitude, speed;
 
-    iss >> date >> time >> latitude >> longitude >> altitude >> stats >> fix >> pdop >> hdop >> vdop >> vnorth >> veast  >> vdown >> speed >> heading;
+    while (iss >> token) {
+        tokens.push_back(token);
+    }
+    if (!(tokens.size() > 13)) {
+        std::cerr << "Invalid data format" << std::endl;
+        return;
+    }
+    latitude = std::stod(tokens[2]);
+    longitude = std::stod(tokens[3]);
+    speed = std::stod(tokens[13]);
     std::string mode = "record";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
     std::thread([this, mode, threshold, latitude, longitude](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
@@ -58,11 +68,22 @@ void States::run_play_function(const char* content) {
     // Extract the latitude and longitude values
     is_recording_ = false;
     std::istringstream iss(content);
-    std::string date, time;
+    std::vector<std::string> tokens;
+    std::string token;
     int stats, fix;
-    double latitude, longitude, altitude, speed, heading, pdop, hdop, vdop, veast, vnorth, vdown;
+    double latitude, longitude, speed;
 
-    iss >> date >> time >> latitude >> longitude >> altitude >> stats >> fix >> pdop >> hdop >> vdop >> vnorth >> veast  >> vdown >> speed >> heading;
+    while (iss >> token) {
+        tokens.push_back(token);
+    }
+    if (!(tokens.size() > 13)) {
+        std::cerr << "Invalid data format" << std::endl;
+        return;
+    }
+    latitude = std::stod(tokens[2]);
+    longitude = std::stod(tokens[3]);
+    speed = std::stod(tokens[13]);
+    std::cout << "current speed: " << speed << std::endl;
     // kinesisStream_.sendPositionData(latitude, longitude);
 
     if (!track_loaded_) {
