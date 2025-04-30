@@ -78,7 +78,7 @@ void States::run_play_function(const char* content) {
             ledController_.set_led_location(-distance, ledController_.map_color(Color::RED), 3);
             std::string mode = "play";
             double threshold = ledController_.get_max_distance_as_lat_long_deg();
-            std::thread([this, mode, threshold, latitude, longitude]](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
+            std::thread([this, mode, threshold, latitude, longitude](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
         }
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;
