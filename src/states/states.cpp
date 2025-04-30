@@ -30,9 +30,7 @@ void States::run_record_function(const char* content) {
     iss >> date >> time >> latitude >> longitude >> altitude >> stats >> fix >> pdop >> hdop >> vdop >> vnorth >> veast  >> vdown >> speed >> heading;
     std::string mode = "record";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
-    std::async(std::launch::async, [&]() {
-        apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
-    });
+    std::thread([](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
     // kinesisStream_.sendPositionData(latitude, longitude);
 
     // Use a mutex to avoid race conditions when writing to the file
@@ -77,12 +75,10 @@ void States::run_play_function(const char* content) {
         if(track_loaded_){
             double distance = boundaryLogic_.calculate_distance(latitude, longitude);
             std::cout << "Distance from track (cm): " << distance << std::endl;
-            ledController_.set_led_location(distance, ledController_.map_color(Color::RED), 3);
+            ledController_.set_led_location(-distance, ledController_.map_color(Color::RED), 3);
             std::string mode = "play";
             double threshold = ledController_.get_max_distance_as_lat_long_deg();
-            std::async(std::launch::async, [&]() {
-                apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode));
-            });
+            std::thread([](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
         }
     } catch (const std::exception& e) {
         std::cerr << "Error calculating distance: " << e.what() << std::endl;
@@ -103,8 +99,6 @@ void States::run_standby_function() {
     std::cout << "Running standby function." << std::endl;
     std::string mode = "standby";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
-    std::async(std::launch::async, [&]() {
-        apiClient_.send_post_request(apiClient_.create_request(0.0, 0.0, threshold, mode));
-    });
+    std::thread([](){ apiClient_.send_post_request(apiClient_.create_request(0.0, 0.0, threshold, mode)); }).detach();
     ledController_.clear();
 }
