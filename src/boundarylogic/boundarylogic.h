@@ -15,6 +15,17 @@ struct Point2D {
     Point2D(double x, double y) : x(x), y(y) {}
 };
 
+struct RecordedPoint {
+    double latitude;
+    double longitude;
+    double speed;
+
+    RecordedPoint() : latitude(0), longitude(0), speed(0) {}
+
+    RecordedPoint(double lat, double lon, double spd)
+        : latitude(lat), longitude(lon), speed(spd) {}
+};
+
 // Create a point cloud structure for nanoflann
 struct PointCloud {
     std::vector<Point2D> points;
@@ -49,11 +60,12 @@ public:
     // Member functions
     double calculate_distance(double latitude, double longitude);
     bool load_track(const std::string& file_path);
+    double get_speed_at_nearest_point(double latitude, double longitude);
 
 private:
     double computeSignedPerpendicularDistance(const Point2D& userPos, const Point2D& closest, const Point2D& next);
 
-    std::vector<Point2D> recorded_path;
+    std::vector<RecordedPoint> recorded_path;
     std::unique_ptr<KDTree> _kdtree_ptr;
     std::unique_ptr<PointCloud> _point_cloud_ptr;
     std::mutex file_mutex;

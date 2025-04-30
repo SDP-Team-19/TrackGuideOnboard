@@ -64,43 +64,12 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
     return signedPerpDist;
 }
 
-// Function to get the speed value at the nearest point on the track
-// double BoundaryLogic::get_speed_at_nearest_point(double latitude, double longitude) {
-//     KNNResultSet<double> resultSet(1);
-//     double queryPt[2] = {latitude, longitude};
-//     size_t nearestIdx;
-//     double outDistSqr;
 
-//     if (recorded_path.empty()) {
-//         throw std::runtime_error("Recorded path is empty.");
-//     }
-
-//     resultSet.init(&nearestIdx, &outDistSqr);
-//     SearchParameters params;
-//     params.sorted = false;
-//     params.eps = 0.0;
-
-//     if (!_kdtree_ptr) {
-//         throw std::runtime_error("KD tree not initialized");
-//     }
-
-//     _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
-    
-//     // Return speed value at nearest point
-//     if (nearestIdx < recorded_path.size() && recorded_path[nearestIdx].speed >= 0) {
-//         return recorded_path[nearestIdx].speed;
-//     }
-    
-//     return -1; // Return -1 if no valid speed found
-// }
 
 
 
 // Function to load track from a saved CSV file
 bool BoundaryLogic::load_track(const std::string& file_path) {
-    // std::cout << "Locking mutex for loading track" << std::endl;
-    // std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
-
     std::cout << "Loading track from file: " << file_path << std::endl;
     std::ifstream file(file_path);
     if (!file.is_open()) {
@@ -112,7 +81,6 @@ bool BoundaryLogic::load_track(const std::string& file_path) {
     // Ensure _kdtree_ptr is properly initialized
     if (!_kdtree_ptr) {
         std::cerr << "_kdtree_ptr is not initialized." << std::endl;
-        // Additional handling or initialization if necessary
     }
 
     PointCloud point_cloud;
@@ -122,18 +90,20 @@ bool BoundaryLogic::load_track(const std::string& file_path) {
     while (std::getline(file, line)) {
         loop_entered = true;
         std::istringstream ss(line);
-        std::string lat_str, lon_str;
-        if (std::getline(ss, lat_str, ',') && std::getline(ss, lon_str, ',')) {
-            double latitude, longitude;
+        std::string lat_str, lon_str, speed_str;
+        if (std::getline(ss, lat_str, ',') && 
+            std::getline(ss, lon_str, ',') && 
+            std::getline(ss, speed_str, ',')) {
             try {
                 double latitude = std::stod(lat_str);
                 double longitude = std::stod(lon_str);
-                // Additional validation if necessary
-                recorded_path.emplace_back(latitude, longitude);
+                double speed = std::stod(speed_str);
+                // Store both location and speed in recorded_path
+                recorded_path.emplace_back(latitude, longitude, speed);
                 point_cloud.points.push_back({latitude, longitude});
             } catch (const std::invalid_argument& e) {
                 std::cerr << "Invalid number format: " << e.what() << std::endl;
-                continue; // Skip to the next line or handle the error as needed
+                continue;
             }
         }
     }
@@ -149,9 +119,8 @@ bool BoundaryLogic::load_track(const std::string& file_path) {
         return false;
     }
 
-    // Load the KDTree into the private variable kdtree
     _point_cloud_ptr = std::make_unique<PointCloud>(point_cloud);
-    _kdtree_ptr = std::make_unique<KDTree>(2, *_point_cloud_ptr, KDTreeSingleIndexAdaptorParams(10 /* max leaf */));
+    _kdtree_ptr = std::make_unique<KDTree>(2, *_point_cloud_ptr, KDTreeSingleIndexAdaptorParams(10));
     _kdtree_ptr->buildIndex();
     std::cout << "Track loaded successfully" << std::endl;
     return true;
@@ -194,4 +163,36 @@ double BoundaryLogic::computeSignedPerpendicularDistance(const Point2D& userPos,
     signedPerpDist *= metersPerKm * cmPerMeter;
 
     return signedPerpDist;
+}
+
+double BoundaryLogic::get_speed_at_nearest_point(double latitude, double longitude) {
+    // std::cout << "Locking mutex for getting speed" << std::endl;
+    // std::lock_guard<std::mutex> lock(kdtree_mutex);  // Lock the mutex to ensure thread safety
+
+    KNNResultSet<double> resultSet(1);
+    double queryPt[2] = {latitude, longitude};
+    size_t nearestIdx;
+    double outDistSqr;
+
+    if (recorded_path.empty()) {
+        throw std::runtime_error("Recorded path is empty.");
+    }
+
+    resultSet.init(&nearestIdx, &outDistSqr);
+    SearchParameters params;
+    params.sorted = false;
+    params.eps = 0.0;
+
+    if (!_kdtree_ptr) {
+        throw std::runtime_error("KD tree not initialized");
+    }
+
+    _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
+
+    // Return speed value at nearest point
+    if (nearestIdx < recorded_path.size() && recorded_path[nearestIdx].speed >= 0) {
+        return recorded_path[nearestIdx].speed;
+    }
+
+    return -1; // Return -1 if no valid speed found
 }

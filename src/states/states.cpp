@@ -6,11 +6,12 @@
 #include <mutex>
 
 States::States(LEDControl& ledController, BoundaryLogic& boundaryLogic, ApiClient& apiClient)
-    : ledController_(ledController), boundaryLogic_(boundaryLogic), apiClient_(apiClient), track_loaded_(false), is_recording_(false), previous_time_(0.0), previous_latitude_(0.0), previous_longitude_(0.0) {
+    : ledController_(ledController), boundaryLogic_(boundaryLogic), apiClient_(apiClient), track_loaded_(false), is_recording_(false), is_playing_(false), previous_time_(0.0), previous_latitude_(0.0), previous_longitude_(0.0) {
 }
 
 void States::run_record_function(const char* content) {
     track_loaded_ = false;
+    is_playing_ = false;
     // Implement the function you want to run in a new process
     std::cout << "Running record function in a new process." << std::endl;
 
@@ -18,6 +19,9 @@ void States::run_record_function(const char* content) {
     // Extract the latitude and longitude values
     if (!is_recording_)
     {
+        previous_latitude_ = 0.0;
+        previous_longitude_ = 0.0;
+        previous_time_ = 0.0;
         ledController_.indicate_record_startup();
         is_recording_ = true;
     }
@@ -35,9 +39,16 @@ void States::run_record_function(const char* content) {
         std::cerr << "Invalid data format" << std::endl;
         return;
     }
+    std::string time = tokens[1];
+    int minutes = std::stoi(time.substr(3, 2));  // extract "33" from "03:33:48.700"
+    int seconds = std::stoi(time.substr(6, 2));  // extract "48" from "03:33:48.700"
+    int milliseconds = std::stoi(time.substr(9, 3));  // extract "700" from "03:33:48.700"
+    double total_seconds = (minutes * 60) + seconds + (milliseconds / 1000.0);
+    std::cout << "Total seconds: " << total_seconds << std::endl;
     latitude = std::stod(tokens[2]);
     longitude = std::stod(tokens[3]);
-    speed = std::stod(tokens[13]);
+    double speed = calculate_speed(latitude, longitude, total_seconds);
+
     std::string mode = "record";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
     std::thread([this, mode, threshold, latitude, longitude](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
@@ -80,7 +91,14 @@ void States::run_play_function(const char* content) {
         std::cerr << "Invalid data format" << std::endl;
         return;
     }
-    
+
+    if (!is_playing_)
+    {
+        previous_latitude_ = 0.0;
+        previous_longitude_ = 0.0;
+        previous_time_ = 0.0;
+        is_playing_ = true;
+    }
 
     std::string time = tokens[1];
     int minutes = std::stoi(time.substr(3, 2));  // extract "33" from "03:33:48.700"
@@ -90,22 +108,7 @@ void States::run_play_function(const char* content) {
     std::cout << "Total seconds: " << total_seconds << std::endl;
     latitude = std::stod(tokens[2]);
     longitude = std::stod(tokens[3]);
-    double speed = 0.0;
-    if (previous_time_ != 0.0 && previous_latitude_ != 0.0 && previous_longitude_ != 0.0) {
-        double distance_lat = latitude - previous_latitude_;
-        double distance_lon = longitude - previous_longitude_;
-        double distance = std::sqrt(distance_lat * distance_lat + distance_lon * distance_lon) * 100000; // Convert to meters
-        double time_diff = total_seconds - previous_time_;
-        if (time_diff > 0) {
-            speed = distance / time_diff; // speed in m/s
-        }
-    } else {
-        std::cout << "No previous data to calculate speed." << std::endl;
-        
-    }
-    double speed_mph = speed * 2.23694; // Convert to mph
-    std::cout << "Speed (m/s): " << speed << ", Speed (mph): " << speed_mph << std::endl;
-    // kinesisStream_.sendPositionData(latitude, longitude);
+    double speed = calculate_speed(latitude, longitude, total_seconds);
 
     if (!track_loaded_) {
         std::cout << "Loading track from coordinates.csv" << std::endl;
@@ -116,8 +119,14 @@ void States::run_play_function(const char* content) {
     try {
         if(track_loaded_){
             double distance = boundaryLogic_.calculate_distance(latitude, longitude);
+            double previous_speed = boundaryLogic_.get_speed_at_nearest_point(latitude, longitude);
+            std::cout << "Speed at nearest point (m/s): " << previous_speed << std::endl;
             std::cout << "Distance from track (cm): " << distance << std::endl;
-            ledController_.set_led_location(-distance, ledController_.map_color(Color::RED), 3);
+            ws2811_led_t color = ledController_.map_color(Color::RED)
+            if (previous_speed > 0) {
+                color = ledController_.get_interpolated_breaking_color(speed, previous_speed, Color::RED, Color::YELLOW, Color::GREEN);
+            }
+            ledController_.set_led_location(-distance, color, 3);
             std::string mode = "play";
             double threshold = ledController_.get_max_distance_as_lat_long_deg();
             std::thread([this, mode, threshold, latitude, longitude](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
@@ -133,6 +142,7 @@ void States::run_play_function(const char* content) {
 void States::run_reset_function() {
     std::lock_guard<std::mutex> lock(file_mutex);
     is_recording_ = false;
+    is_recording_ = false;
     if (remove("coordinates.csv") != 0) {
         std::cout << "Could not delete coordinates.csv" << std::endl;
     } else {
@@ -141,9 +151,32 @@ void States::run_reset_function() {
 }
 
 void States::run_standby_function() {
+    is_recording_ = false;
+    is_playing_ = false;
     std::cout << "Running standby function." << std::endl;
     std::string mode = "standby";
     double threshold = ledController_.get_max_distance_as_lat_long_deg();
     std::thread([this, mode, threshold](){ apiClient_.send_post_request(apiClient_.create_request(0.0, 0.0, threshold, mode)); }).detach();
+    previous_latitude_ = 0.0;
+    previous_longitude_ = 0.0;
+    previous_time_ = 0.0;
     ledController_.clear();
+}
+
+double States::calculate_speed(double latitude, double longitude, double current_time) {
+    // Calculate the speed based on the previous and current positions
+    if (previous_time_ != 0.0 && previous_latitude_ != 0.0 && previous_longitude_ != 0.0) {
+        double distance_lat = latitude - previous_latitude_;
+        double distance_lon = longitude - previous_longitude_;
+        double distance = std::sqrt(distance_lat * distance_lat + distance_lon * distance_lon) * 100000; // Convert to meters
+        double time_diff = current_time - previous_time_;
+        if (time_diff > 0) {
+            double speed = distance / time_diff;
+            double speed_mph = speed * 2.23694;
+            std::cout << "Speed (m/s): " << speed << ", Speed (mph): " << speed_mph << std::endl;
+            return speed; // speed in m/s
+        }
+    }
+    std::cout << "No previous data to calculate speed." << std::endl;
+    return 0.0;
 }

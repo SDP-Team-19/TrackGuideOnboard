@@ -18,11 +18,13 @@ private:
     BoundaryLogic& boundaryLogic_;
     bool track_loaded_;  // Flag to indicate whether the track has been loaded
     bool is_recording_;
+    bool is_playing_;
     float previous_time_;
     double previous_latitude_;
     double previous_longitude_; 
     ApiClient& apiClient_;
     std::mutex file_mutex;
+    double calculate_speed(double latitude, double longitude, double current_time);
 };
 
 #endif // STATES_H
