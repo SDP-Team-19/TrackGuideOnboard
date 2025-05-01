@@ -120,7 +120,6 @@ void LEDControl::indicate_record_startup() {
 }
 
 void LEDControl::set_led_location(double distance, ws2811_led_t color, int pixel_width) {
-
     // Map the distance to a floating-point LED position
     double ledPosition = (distance + _maxDistance) * (_stripLength - 1) / (2 * _maxDistance);
     std::vector<double> ledBrightness(_stripLength);
@@ -149,6 +148,13 @@ void LEDControl::set_led_location(double distance, ws2811_led_t color, int pixel
         } else {
             _ledstring.channel[1].leds[i] = 0;
         }
+    }
+
+    // Ensure first/last LED is lit when at strip edges
+    if (ledPosition <= 0) {
+        _ledstring.channel[1].leds[0] = color;
+    } else if (ledPosition >= _stripLength - 1) {
+        _ledstring.channel[1].leds[_stripLength - 1] = color;
     }
 
     // Render the updated colors to the LED strip
