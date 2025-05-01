@@ -85,6 +85,9 @@ void States::run_record_function(const char* content) {
     outfile.close();
 
     std::cout << "Latitude: " << latitude << ", Longitude: " << longitude << " saved to coordinates.csv" << std::endl;
+    previous_latitude_ = latitude;
+    previous_longitude_ = longitude;
+    previous_time_ = total_seconds;
 }
 
 void States::run_play_function(const char* content) {
