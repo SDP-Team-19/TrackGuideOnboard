@@ -65,9 +65,6 @@ double BoundaryLogic::calculate_distance(double latitude, double longitude) {
 }
 
 
-
-
-
 // Function to load track from a saved CSV file
 bool BoundaryLogic::load_track(const std::string& file_path) {
     std::cout << "Loading track from file: " << file_path << std::endl;

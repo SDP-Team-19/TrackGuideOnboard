@@ -93,6 +93,7 @@ void States::run_record_function(const char* content) {
 
 void States::run_play_function(const char* content) {
     // Extract the latitude and longitude values
+    float speed_scale_factor = 1.0;
     is_recording_ = false;
     std::istringstream iss(content);
     std::vector<std::string> tokens;
@@ -147,8 +148,24 @@ void States::run_play_function(const char* content) {
     // Calculate the distance
     try {
         if(track_loaded_){
-            double distance = boundaryLogic_.calculate_distance(latitude, longitude);
-            double previous_speed = boundaryLogic_.get_speed_at_nearest_point(latitude, longitude);
+            // Calculate next predicted position based on current velocity vector
+            double lat_velocity = latitude - previous_latitude_;
+            double lon_velocity = longitude - previous_longitude_;
+            double vector_magnitude = sqrt(lat_velocity * lat_velocity + lon_velocity * lon_velocity);
+            if (vector_magnitude <= 0)
+            {
+                std::cout << "no movement since last vector, skipping" << std::endl;
+                return;
+            }
+            double normalized_lat = lat_velocity / vector_magnitude;
+            double normalized_lon = lon_velocity / vector_magnitude;
+            // Convert speed from m/s to degrees/s (approximately 1 degree = 111000 meters)
+            double speed_in_degrees = speed / 111000.0;
+            double next_lat = latitude + (normalized_lat * speed_in_degrees * speed_scale_factor);
+            double next_lon = longitude + (normalized_lon * speed_in_degrees * speed_scale_factor);
+            std::cout << "Next predicted position: " << next_lat << ", " << next_lon << std::endl;
+            double distance = boundaryLogic_.calculate_distance(next_lat, next_lon);
+            double previous_speed = boundaryLogic_.get_speed_at_nearest_point(next_lat, next_lon);
             std::cout << "Speed at nearest point (m/s): " << previous_speed << std::endl;
             std::cout << "Distance from track (cm): " << distance << std::endl;
             ws2811_led_t color = previous_color_;
