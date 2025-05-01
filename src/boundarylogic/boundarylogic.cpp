@@ -197,6 +197,8 @@ double BoundaryLogic::get_speed_at_nearest_point(double latitude, double longitu
     _kdtree_ptr->findNeighbors(resultSet, queryPt, params);
 
     // Return speed value at nearest point
+    std::cout << "Size of path: " << recorded_path.size() << std::endl;
+    std::cout << "Nearest index: " << nearestIdx << std::endl;
     if (nearestIdx < recorded_path.size() && recorded_path[nearestIdx].speed >= 0) {
         return recorded_path[nearestIdx].speed;
     }
