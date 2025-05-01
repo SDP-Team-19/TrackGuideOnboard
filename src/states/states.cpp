@@ -29,7 +29,6 @@ void States::run_record_function(const char* content) {
     std::istringstream iss(content);
     std::vector<std::string> tokens;
     std::string token;
-    int stats, fix;
     double latitude, longitude;
 
     while (iss >> token) {
@@ -40,9 +39,22 @@ void States::run_record_function(const char* content) {
         return;
     }
     std::string time = tokens[1];
-    int minutes = std::stoi(time.substr(3, 2));  // extract "33" from "03:33:48.700"
-    int seconds = std::stoi(time.substr(6, 2));  // extract "48" from "03:33:48.700"
-    int milliseconds = std::stoi(time.substr(9, 3));  // extract "700" from "03:33:48.700"
+    float minutes = 0;
+    float seconds = 0;
+    float milliseconds = 0;
+    try {
+        if (time.length() >= 12) {  // Ensure string is long enough
+            minutes = std::stof(time.substr(3, 2));  // extract "33" from "03:33:48.700"
+            seconds = std::stof(time.substr(6, 2));  // extract "48" from "03:33:48.700"
+            milliseconds = std::stof(time.substr(9, 3));  // extract "700" from "03:33:48.700"
+        } else {
+            std::cerr << "Time string too short: " << time << std::endl;
+            return;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error parsing time string: " << time << std::endl;
+        return;
+    }
     double total_seconds = (minutes * 60) + seconds + (milliseconds / 1000.0);
     std::cout << "Total seconds: " << total_seconds << std::endl;
     latitude = std::stod(tokens[2]);
