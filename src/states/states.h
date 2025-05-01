@@ -24,6 +24,7 @@ private:
     double previous_longitude_; 
     ApiClient& apiClient_;
     std::mutex file_mutex;
+    ws2811_led_t previous_color_;
     double calculate_speed(double latitude, double longitude, double current_time);
 };
 

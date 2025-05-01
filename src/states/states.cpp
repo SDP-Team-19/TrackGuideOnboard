@@ -6,7 +6,7 @@
 #include <mutex>
 
 States::States(LEDControl& ledController, BoundaryLogic& boundaryLogic, ApiClient& apiClient)
-    : ledController_(ledController), boundaryLogic_(boundaryLogic), apiClient_(apiClient), track_loaded_(false), is_recording_(false), is_playing_(false), previous_time_(0.0), previous_latitude_(0.0), previous_longitude_(0.0) {
+    : ledController_(ledController), boundaryLogic_(boundaryLogic), apiClient_(apiClient), track_loaded_(false), is_recording_(false), is_playing_(false), previous_time_(0.0), previous_latitude_(0.0), previous_longitude_(0.0), previous_color_(0x00002000){
 }
 
 void States::run_record_function(const char* content) {
@@ -151,9 +151,10 @@ void States::run_play_function(const char* content) {
             double previous_speed = boundaryLogic_.get_speed_at_nearest_point(latitude, longitude);
             std::cout << "Speed at nearest point (m/s): " << previous_speed << std::endl;
             std::cout << "Distance from track (cm): " << distance << std::endl;
-            ws2811_led_t color = ledController_.map_color(Color::RED);
+            ws2811_led_t color = previous_color_;
             if (previous_speed > 0) {
                 color = ledController_.get_interpolated_breaking_color(speed, previous_speed, Color::GREEN, Color::YELLOW, Color::RED);
+                previous_color_ = color;
             }
             ledController_.set_led_location(-distance, color, 3);
             std::string mode = "play";
