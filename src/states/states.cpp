@@ -153,7 +153,7 @@ void States::run_play_function(const char* content) {
             std::cout << "Distance from track (cm): " << distance << std::endl;
             ws2811_led_t color = ledController_.map_color(Color::RED);
             if (previous_speed > 0) {
-                color = ledController_.get_interpolated_breaking_color(speed, previous_speed, Color::RED, Color::YELLOW, Color::GREEN);
+                color = ledController_.get_interpolated_breaking_color(speed, previous_speed, Color::GREEN, Color::YELLOW, Color::RED);
             }
             ledController_.set_led_location(-distance, color, 3);
             std::string mode = "play";
