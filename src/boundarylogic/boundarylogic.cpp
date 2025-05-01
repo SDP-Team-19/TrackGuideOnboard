@@ -108,6 +108,7 @@ bool BoundaryLogic::load_track(const std::string& file_path) {
         }
     }
 
+
     if (!loop_entered) {
         std::cout << "No lines read from the file." << std::endl;
     }
@@ -122,6 +123,12 @@ bool BoundaryLogic::load_track(const std::string& file_path) {
     _point_cloud_ptr = std::make_unique<PointCloud>(point_cloud);
     _kdtree_ptr = std::make_unique<KDTree>(2, *_point_cloud_ptr, KDTreeSingleIndexAdaptorParams(10));
     _kdtree_ptr->buildIndex();
+    std::cout << "Point Cloud size: " << _point_cloud_ptr->points.size() << std::endl;
+    std::cout << "Recorded Path size: " << recorded_path.size() << std::endl;
+    std::cout << "\nRecorded Path Points:" << std::endl;
+    for (const auto& point : recorded_path) {
+        std::cout << "Lat: " << point.latitude << ", Lon: " << point.longitude << ", Speed: " << point.speed << std::endl;
+    }
     std::cout << "Track loaded successfully" << std::endl;
     return true;
 }
