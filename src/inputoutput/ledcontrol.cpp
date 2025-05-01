@@ -143,9 +143,9 @@ void LEDControl::set_led_location(double distance, ws2811_led_t color, int pixel
     // Apply brightness to each LED
     for (int i = 0; i < _stripLength; i++) {
         if (ledBrightness[i] > 0.0) {
-            _ledstring.channel[1].leds[i] = ((static_cast<uint32_t>(r * ledBrightness[i]) << 16) |
-                                           (static_cast<uint32_t>(g * ledBrightness[i]) << 8) |
-                                           static_cast<uint32_t>(b * ledBrightness[i]));
+            _ledstring.channel[1].leds[i] = ((static_cast<uint32_t>(r) << 16) |
+                                           (static_cast<uint32_t>(g) << 8) |
+                                           static_cast<uint32_t>(b));
         } else {
             _ledstring.channel[1].leds[i] = 0;
         }
