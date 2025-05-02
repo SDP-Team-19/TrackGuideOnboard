@@ -173,7 +173,7 @@ void States::run_play_function(const char* content) {
                 color = ledController_.get_interpolated_breaking_color(speed, previous_speed, Color::GREEN, Color::YELLOW, Color::RED);
                 previous_color_ = color;
             }
-            ledController_.set_led_location(-distance, color, 3);
+            ledController_.set_led_location(distance, color, 3);
             std::string mode = "play";
             double threshold = ledController_.get_max_distance_as_lat_long_deg();
             std::thread([this, mode, threshold, latitude, longitude](){ apiClient_.send_post_request(apiClient_.create_request(latitude, longitude, threshold, mode)); }).detach();
